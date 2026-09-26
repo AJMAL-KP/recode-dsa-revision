@@ -1,11 +1,134 @@
 /* Custom professional styles for ReCode - Clean Engineering Theme */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
+/* ==========================================================================
+   CSS VARIABLES & DESIGN TOKENS
+   ========================================================================== */
 :root {
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+
+    /* Primary Brand Colors (Constant in both themes) */
+    --color-primary: #ea580c;
+    --color-primary-hover: #f97316;
+    --color-primary-active: #c2410c;
+    --color-primary-text: #ffffff;
+    --color-primary-glow: rgba(234, 88, 12, 0.32);
+    --color-primary-subtle: rgba(249, 115, 22, 0.1);
+    --color-primary-subtle-border: rgba(249, 115, 22, 0.3);
+
+    /* Consistent Standardized Transition Durations & Easing Across Entire App */
+    --duration-interactive: 0.2s;
+    --duration-theme: 0.25s;
+    --ease-interactive: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-theme: ease;
+
+    --transition-theme: background-color var(--duration-theme) var(--ease-theme),
+                        border-color var(--duration-theme) var(--ease-theme),
+                        color var(--duration-theme) var(--ease-theme),
+                        box-shadow var(--duration-theme) var(--ease-theme);
+
+    --transition-btn: transform var(--duration-interactive) var(--ease-interactive),
+                      box-shadow var(--duration-interactive) var(--ease-interactive),
+                      background-color var(--duration-interactive) var(--ease-interactive),
+                      border-color var(--duration-interactive) var(--ease-interactive),
+                      color var(--duration-interactive) var(--ease-interactive);
+
+    --transition-input: border-color var(--duration-interactive) var(--ease-interactive),
+                        box-shadow var(--duration-interactive) var(--ease-interactive),
+                        background-color var(--duration-interactive) var(--ease-interactive),
+                        color var(--duration-interactive) var(--ease-interactive);
 }
 
+/* Dark Theme Variables (Default) */
+html.dark, :root:not(.light) {
+    --color-bg-base: #0b0f17;
+    --color-bg-surface: #101623;
+    --color-bg-elevated: #161e30;
+    --color-bg-subtle: #1e293b;
+    --color-bg-input: #0f172a;
+    --color-bg-input-hover: #131c31;
+
+    --color-border-base: rgba(255, 255, 255, 0.08);
+    --color-border-subtle: rgba(255, 255, 255, 0.05);
+    --color-border-hover: rgba(255, 255, 255, 0.18);
+    --color-border-focus: #f97316;
+
+    --color-text-title: #ffffff;
+    --color-text-main: #f8fafc;
+    --color-text-body: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-text-faint: #64748b;
+    --color-text-hover: #ffffff;
+
+    --color-nav-bg: rgba(11, 15, 23, 0.95);
+    --color-nav-border: rgba(255, 255, 255, 0.08);
+
+    --color-btn-secondary-bg: rgba(255, 255, 255, 0.05);
+    --color-btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
+    --color-btn-secondary-text: #cbd5e1;
+    --color-btn-secondary-hover-text: #ffffff;
+    --color-btn-secondary-border: rgba(255, 255, 255, 0.1);
+    --color-btn-secondary-hover-border: rgba(255, 255, 255, 0.2);
+
+    --color-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    --color-modal-bg: #101623;
+    --color-modal-border: rgba(255, 255, 255, 0.1);
+    --color-toast-bg: rgba(16, 22, 35, 0.96);
+    --color-toast-text: #ffffff;
+    --color-toast-border: rgba(249, 115, 22, 0.4);
+
+    --scrollbar-track: #0b0f17;
+    --scrollbar-thumb: #1e293b;
+    --scrollbar-thumb-hover: #334155;
+}
+
+/* Light Theme Variables */
+html.light {
+    --color-bg-base: #f8fafc;
+    --color-bg-surface: #ffffff;
+    --color-bg-elevated: #f1f5f9;
+    --color-bg-subtle: #e2e8f0;
+    --color-bg-input: #ffffff;
+    --color-bg-input-hover: #f8fafc;
+
+    --color-border-base: rgba(0, 0, 0, 0.09);
+    --color-border-subtle: rgba(0, 0, 0, 0.05);
+    --color-border-hover: rgba(0, 0, 0, 0.2);
+    --color-border-focus: #ea580c;
+
+    --color-text-title: #0f172a;
+    --color-text-main: #0f172a;
+    --color-text-body: #1e293b;
+    --color-text-muted: #475569;
+    --color-text-faint: #64748b;
+    --color-text-hover: #0f172a;
+
+    --color-nav-bg: rgba(255, 255, 255, 0.96);
+    --color-nav-border: transparent; /* No bottom border in light mode */
+
+    --color-btn-secondary-bg: #f1f5f9;
+    --color-btn-secondary-hover-bg: #e2e8f0;
+    --color-btn-secondary-text: #334155;
+    --color-btn-secondary-hover-text: #0f172a;
+    --color-btn-secondary-border: rgba(0, 0, 0, 0.1);
+    --color-btn-secondary-hover-border: rgba(0, 0, 0, 0.2);
+
+    --color-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    --color-modal-bg: #ffffff;
+    --color-modal-border: rgba(0, 0, 0, 0.1);
+    --color-toast-bg: #ffffff;
+    --color-toast-text: #0f172a;
+    --color-toast-border: rgba(249, 115, 22, 0.45);
+
+    --scrollbar-track: #f8fafc;
+    --scrollbar-thumb: #cbd5e1;
+    --scrollbar-thumb-hover: #94a3b8;
+}
+
+/* ==========================================================================
+   GLOBAL LAYOUT & SMOOTH TRANSITION
+   ========================================================================== */
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
@@ -13,8 +136,8 @@ html {
 
 body {
     font-family: var(--font-sans);
-    background-color: #0b0f17;
-    color: #e2e8f0;
+    background-color: var(--color-bg-base);
+    color: var(--color-text-body);
     overflow-x: hidden;
 }
 
@@ -22,82 +145,915 @@ body {
     font-family: var(--font-mono);
 }
 
-/* Professional Solid & Subtle Glass Surfaces */
+/* Seamless theme crossfade across all surfaces with unified 0.25s duration */
+body,
+nav,
+main,
+footer,
+.glass-panel,
+.glass-panel-glow,
+.glass-card,
+#hero-auth-card,
+#problems-container,
+#cta > div,
+#addProblemModal > div,
+.toast-item,
+#demo-result,
+input,
+textarea,
+select,
+.theme-toggle-btn,
+.btn-logout {
+    transition: var(--transition-theme);
+}
+
+/* ==========================================================================
+   MICRO-ANIMATIONS & INTERACTIVE BUTTONS
+   ========================================================================== */
+/* Universal Button Base Transition (0.2s duration) */
+button,
+a.btn-primary,
+a.btn-secondary,
+.btn-primary,
+.btn-secondary,
+.btn-logout,
+[type="button"],
+[type="submit"] {
+    transition: var(--transition-btn);
+}
+
+/* Primary Orange Buttons: Hover Lift + Glow + Active Press */
+.bg-orange-600,
+.bg-orange-500,
+.btn-primary,
+button.bg-orange-600,
+button.bg-orange-500,
+a.bg-orange-600,
+a.bg-orange-500,
+html.light .bg-orange-600,
+html.light .bg-orange-500,
+html.light .btn-primary,
+html.light button.bg-orange-600,
+html.light button.bg-orange-500,
+html.light a.bg-orange-600,
+html.light a.bg-orange-500 {
+    color: var(--color-primary-text) !important;
+}
+
+.bg-orange-600 *,
+.bg-orange-500 *,
+.btn-primary *,
+html.light .bg-orange-600 *,
+html.light .bg-orange-500 *,
+html.light .btn-primary * {
+    color: var(--color-primary-text) !important;
+}
+
+.bg-orange-600:hover,
+.bg-orange-500:hover,
+.btn-primary:hover,
+button.bg-orange-600:hover,
+button.bg-orange-500:hover,
+a.bg-orange-600:hover,
+a.bg-orange-500:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 18px -2px var(--color-primary-glow) !important;
+}
+
+.bg-orange-600:active,
+.bg-orange-500:active,
+.btn-primary:active,
+button.bg-orange-600:active,
+button.bg-orange-500:active,
+a.bg-orange-600:active,
+a.bg-orange-500:active {
+    transform: translateY(0.5px) scale(0.985);
+    box-shadow: 0 2px 6px -1px var(--color-primary-glow) !important;
+}
+
+/* Directional Icon Nudge on Button Hover */
+.bg-orange-600:hover i[data-lucide="arrow-right"],
+.btn-primary:hover i[data-lucide="arrow-right"],
+button.bg-orange-600:hover i[data-lucide="arrow-right"] {
+    transform: translateX(3px);
+}
+.bg-orange-600 i[data-lucide="arrow-right"],
+.btn-primary i[data-lucide="arrow-right"],
+button.bg-orange-600 i[data-lucide="arrow-right"] {
+    transition: transform var(--duration-interactive) var(--ease-interactive);
+}
+
+/* Secondary Boxed Buttons Micro-animations */
+.btn-secondary,
+button.btn-secondary,
+a.btn-secondary,
+button.border:not([class*="bg-orange"]):not(.theme-toggle-btn):not(.btn-logout):not(.outcome-btn):not(.btn-ghost):not(.btn-close),
+a.border:not([class*="bg-orange"]):not(.theme-toggle-btn):not(.btn-logout):not(.outcome-btn):not(.btn-ghost) {
+    cursor: pointer;
+    transition: var(--transition-btn);
+}
+
+.btn-secondary:hover,
+button.btn-secondary:hover,
+a.btn-secondary:hover,
+button.border:not([class*="bg-orange"]):not(.theme-toggle-btn):not(.btn-logout):not(.outcome-btn):not(.btn-ghost):not(.btn-close):hover,
+a.border:not([class*="bg-orange"]):not(.theme-toggle-btn):not(.btn-logout):not(.outcome-btn):not(.btn-ghost):hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:active,
+button.btn-secondary:active,
+a.btn-secondary:active,
+button.border:not([class*="bg-orange"]):not(.theme-toggle-btn):not(.btn-logout):not(.outcome-btn):not(.btn-ghost):not(.btn-close):active,
+a.border:not([class*="bg-orange"]):not(.theme-toggle-btn):not(.btn-logout):not(.outcome-btn):not(.btn-ghost):active {
+    transform: translateY(0.5px) scale(0.985);
+}
+
+/* Ghost & Text Action Buttons (e.g. Learn How It Works - Strictly No Outlines or Shadows) */
+.btn-ghost,
+button.btn-ghost,
+a.btn-ghost {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    transition: var(--transition-btn);
+}
+
+.btn-ghost:hover,
+button.btn-ghost:hover,
+a.btn-ghost:hover {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transform: translateX(3px);
+    color: var(--color-primary-hover) !important;
+}
+
+.btn-ghost:active,
+button.btn-ghost:active,
+a.btn-ghost:active {
+    transform: scale(0.97);
+    box-shadow: none !important;
+}
+
+.btn-ghost:focus,
+.btn-ghost:focus-visible,
+button.btn-ghost:focus,
+button.btn-ghost:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn-ghost i[data-lucide="arrow-right"],
+button.btn-ghost i[data-lucide="arrow-right"] {
+    transition: transform var(--duration-interactive) var(--ease-interactive);
+}
+.btn-ghost:hover i[data-lucide="arrow-right"],
+button.btn-ghost:hover i[data-lucide="arrow-right"] {
+    transform: translateX(3px);
+}
+
+/* Close & Modal Dismiss Buttons Micro-animation */
+.btn-close,
+button[onclick*="closeAddProblemModal"],
+button[onclick*="dismissToast"] {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    transition: transform var(--duration-interactive) var(--ease-interactive),
+                color var(--duration-interactive) var(--ease-interactive) !important;
+}
+
+.btn-close:hover,
+button[onclick*="closeAddProblemModal"]:hover,
+button[onclick*="dismissToast"]:hover {
+    transform: scale(1.15) rotate(90deg);
+}
+
+.btn-close:active,
+button[onclick*="closeAddProblemModal"]:active,
+button[onclick*="dismissToast"]:active {
+    transform: scale(0.9);
+}
+
+/* Header Navigation Sign In Button Micro-animations */
+.btn-nav-signin {
+    transition: var(--transition-btn);
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn-nav-signin:hover {
+    transform: translateY(-1px);
+    color: var(--color-primary) !important;
+    background-color: var(--color-primary-subtle);
+}
+
+.btn-nav-signin:active {
+    transform: translateY(0.5px) scale(0.96);
+}
+
+html.light .btn-nav-signin {
+    color: var(--color-text-muted) !important;
+}
+
+html.light .btn-nav-signin:hover {
+    color: var(--color-primary) !important;
+    background-color: #fff7ed !important;
+}
+
+/* Demo Progressive Reveal Buttons Micro-animations */
+.btn-reveal,
+button[onclick*="toggleReveal"] {
+    transition: var(--transition-btn);
+    cursor: pointer;
+}
+
+.btn-reveal:hover,
+button[onclick*="toggleReveal"]:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px -2px rgba(249, 115, 22, 0.25);
+    border-color: rgba(249, 115, 22, 0.45) !important;
+    color: var(--color-primary) !important;
+}
+
+.btn-reveal:active,
+button[onclick*="toggleReveal"]:active {
+    transform: translateY(0.5px) scale(0.96);
+    box-shadow: 0 1px 4px -1px rgba(249, 115, 22, 0.2);
+}
+
+html.light .btn-reveal {
+    background-color: var(--color-btn-secondary-bg) !important;
+    border-color: var(--color-btn-secondary-border) !important;
+    color: var(--color-text-muted) !important;
+}
+
+html.light .btn-reveal:hover {
+    background-color: #fff7ed !important;
+    border-color: rgba(249, 115, 22, 0.45) !important;
+    color: var(--color-primary) !important;
+}
+
+html.light .btn-reveal.bg-orange-500\/20 {
+    background-color: #ffedd5 !important;
+    border-color: var(--color-primary-hover) !important;
+    color: var(--color-primary) !important;
+}
+
+/* Interactive Demo Rating Buttons */
+.outcome-btn {
+    transition: var(--transition-btn);
+}
+.outcome-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px -2px rgba(249, 115, 22, 0.18);
+}
+.outcome-btn:active {
+    transform: translateY(0) scale(0.985);
+}
+
+/* ==========================================================================
+   INTERACTIVE LIGHT / DARK MODE TOGGLE BUTTON MICRO-ANIMATIONS
+   ========================================================================== */
+.theme-toggle-btn {
+    transition: var(--transition-btn);
+    cursor: pointer;
+}
+
+.theme-toggle-btn:hover {
+    transform: translateY(-1.5px) scale(1.05);
+    box-shadow: 0 4px 14px -2px rgba(249, 115, 22, 0.25) !important;
+}
+
+.theme-toggle-btn:active {
+    transform: translateY(0.5px) scale(0.92);
+}
+
+.theme-icon-sun,
+.theme-icon-moon {
+    transition: transform var(--duration-theme) cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity var(--duration-theme) var(--ease-theme);
+    display: inline-block;
+}
+
+html.dark .theme-icon-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    pointer-events: auto;
+}
+html.dark .theme-icon-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.35);
+    pointer-events: none;
+}
+
+html.light .theme-icon-sun {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.35);
+    pointer-events: none;
+}
+html.light .theme-icon-moon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    pointer-events: auto;
+}
+
+/* Subtle icon micro-rotation when hovering the toggle button */
+html.dark .theme-toggle-btn:hover .theme-icon-sun {
+    transform: rotate(20deg) scale(1.12);
+}
+html.light .theme-toggle-btn:hover .theme-icon-moon {
+    transform: rotate(-15deg) scale(1.12);
+}
+
+html.light .theme-toggle-btn {
+    background-color: var(--color-btn-secondary-bg) !important;
+    border-color: var(--color-btn-secondary-border) !important;
+    color: var(--color-text-muted) !important;
+}
+
+html.light .theme-toggle-btn:hover {
+    background-color: #fff7ed !important;
+    border-color: rgba(249, 115, 22, 0.45) !important;
+    color: var(--color-primary) !important;
+}
+
+/* ==========================================================================
+   LOGOUT BUTTON MICRO-ANIMATIONS & INTERACTIVE STATES
+   ========================================================================== */
+.btn-logout {
+    transition: var(--transition-btn);
+    cursor: pointer;
+}
+
+.btn-logout:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.2);
+}
+
+.btn-logout:active {
+    transform: translateY(0.5px) scale(0.92);
+}
+
+.btn-logout i[data-lucide="log-out"] {
+    transition: transform var(--duration-interactive) var(--ease-interactive);
+}
+
+.btn-logout:hover i[data-lucide="log-out"] {
+    transform: translateX(2.5px);
+}
+
+/* Dark Mode Logout Button Hover */
+html.dark .btn-logout:hover,
+:root:not(.light) .btn-logout:hover {
+    background-color: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+    color: #f87171 !important;
+    box-shadow: 0 4px 14px -2px rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Light Mode Logout Button */
+html.light .btn-logout {
+    background-color: var(--color-btn-secondary-bg) !important;
+    border-color: var(--color-btn-secondary-border) !important;
+    color: var(--color-text-muted) !important;
+}
+
+html.light .btn-logout:hover {
+    background-color: #fef2f2 !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+    box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.12) !important;
+}
+
+/* ==========================================================================
+   FORMS, INPUTS & HOVER STATES
+   ========================================================================== */
+input,
+textarea,
+select {
+    background-color: var(--color-bg-input);
+    border: 1px solid var(--color-border-base);
+    color: var(--color-text-main);
+    transition: var(--transition-input);
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-bg-input-hover);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--color-border-focus) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px var(--color-primary-subtle) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--color-text-faint);
+}
+
+/* ==========================================================================
+   SURFACES & CARDS
+   ========================================================================== */
 .glass-panel {
-    background: #111726;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-base);
 }
 
 .glass-panel-glow {
-    background: #111726;
-    border: 1px solid rgba(249, 115, 22, 0.25);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-primary-subtle-border);
+    box-shadow: var(--color-card-shadow);
 }
 
 .glass-card {
-    background: #101623;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    transition: all 0.2s ease;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-base);
+    box-shadow: var(--color-card-shadow);
+    transition: var(--transition-btn);
 }
 
 .glass-card:hover {
-    border-color: rgba(249, 115, 22, 0.35);
-    background: #141c2c;
+    border-color: var(--color-primary-subtle-border);
+    background: var(--color-bg-elevated);
 }
 
-/* Orange Gradient Accents */
 .gradient-text {
     background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.gradient-border {
-    position: relative;
-    border-radius: 0.75rem;
-    background: #111726;
+/* ==========================================================================
+   LIGHT MODE TARGETED OVERRIDES (Clean 3-Color Hierarchy)
+   ========================================================================== */
+html.light body {
+    background-color: var(--color-bg-base);
+    color: var(--color-text-body);
 }
 
-/* Clean Button Styles */
-.btn-primary {
-    background: #ea580c;
-    color: #ffffff;
-    font-weight: 600;
-    transition: all 0.15s ease;
+/* Light mode header: strictly NO bottom border */
+html.light nav {
+    background-color: var(--color-nav-bg) !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
 }
 
-.btn-primary:hover {
-    background: #f97316;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+html.light nav a span.text-white {
+    color: var(--color-text-title) !important;
 }
 
-.btn-secondary {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #cbd5e1;
-    font-weight: 500;
-    transition: all 0.15s ease;
+html.light nav a.text-slate-300 {
+    color: var(--color-text-muted) !important;
 }
 
-.btn-secondary:hover {
-    background: #283548;
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.2);
+html.light nav a.text-slate-300:hover {
+    color: var(--color-text-title) !important;
 }
 
-/* Custom Scrollbars */
+/* Background mappings in light mode */
+html.light .bg-\[\#0b0f17\] {
+    background-color: var(--color-bg-base) !important;
+}
+
+html.light .bg-\[\#101623\] {
+    background-color: var(--color-bg-surface) !important;
+    border-color: var(--color-border-base) !important;
+    box-shadow: var(--color-card-shadow);
+}
+
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900 {
+    background-color: var(--color-bg-elevated) !important;
+    border-color: var(--color-border-base) !important;
+}
+
+html.light .bg-slate-950\/70,
+html.light .bg-slate-950\/80,
+html.light .bg-slate-950 {
+    background-color: var(--color-bg-subtle) !important;
+    border-color: var(--color-border-subtle) !important;
+}
+
+/* ==========================================================================
+   TEXT HIERARCHY IN LIGHT MODE
+   ========================================================================== */
+
+/* 1. All Headings */
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6 {
+    color: var(--color-text-title) !important;
+}
+
+/* 2. Universal Dark-Theme White Text mapped to Dark Slate in Light Mode */
+html.light .text-white {
+    color: var(--color-text-title) !important;
+}
+
+/* 3. Slate Color Scales in Light Mode */
+html.light .text-slate-100,
+html.light .text-slate-200,
+html.light .text-slate-300 {
+    color: var(--color-text-body) !important;
+}
+
+html.light .text-slate-400 {
+    color: var(--color-text-muted) !important;
+}
+
+html.light .text-slate-500 {
+    color: var(--color-text-faint) !important;
+}
+
+html.light label {
+    color: var(--color-text-muted) !important;
+}
+
+/* 4. Orange Accent Readability in Light Mode (Deepen pale orange text for contrast) */
+html.light .text-orange-400,
+html.light .text-orange-300 {
+    color: #ea580c !important;
+}
+
+/* 5. Colored Badges & Recall Options in Light Mode */
+html.light .text-emerald-400 {
+    color: #059669 !important;
+}
+
+html.light .text-rose-400 {
+    color: #e11d48 !important;
+}
+
+html.light .text-amber-400 {
+    color: #b45309 !important;
+}
+
+html.light .text-purple-400 {
+    color: #9333ea !important;
+}
+
+/* Light mode demo rating recall buttons */
+html.light .demo-rating-btn {
+    background-color: #f8fafc !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .demo-rating-btn:hover {
+    background-color: #ffffff !important;
+}
+
+/* Light mode selected states for recall buttons */
+html.light .demo-rating-btn.selected-forgot {
+    background-color: #faf5ff !important;
+    border-color: #9333ea !important;
+    box-shadow: 0 4px 14px -2px rgba(147, 51, 234, 0.22) !important;
+}
+
+html.light .demo-rating-btn.selected-hard {
+    background-color: #fff1f2 !important;
+    border-color: #e11d48 !important;
+    box-shadow: 0 4px 14px -2px rgba(225, 29, 72, 0.22) !important;
+}
+
+html.light .demo-rating-btn.selected-medium {
+    background-color: #fffbeb !important;
+    border-color: #d97706 !important;
+    box-shadow: 0 4px 14px -2px rgba(217, 119, 6, 0.22) !important;
+}
+
+html.light .demo-rating-btn.selected-easy {
+    background-color: #ecfdf5 !important;
+    border-color: #059669 !important;
+    box-shadow: 0 4px 14px -2px rgba(5, 150, 105, 0.22) !important;
+}
+
+html.light .demo-rating-btn.is-dimmed {
+    background-color: #f1f5f9 !important;
+    border-color: rgba(0, 0, 0, 0.05) !important;
+    opacity: 0.45 !important;
+}
+
+/* 6. Form Inputs & Controls in Light Mode */
+html.light input,
+html.light textarea,
+html.light select {
+    background-color: var(--color-bg-input) !important;
+    border-color: var(--color-border-base) !important;
+    color: var(--color-text-title) !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+    color: var(--color-text-faint) !important;
+}
+
+html.light input:focus,
+html.light textarea:focus,
+html.light select:focus {
+    border-color: var(--color-border-focus) !important;
+    box-shadow: 0 0 0 1px var(--color-border-focus) !important;
+}
+
+/* 7. Border and Container Background Overrides in Light Mode */
+html.light .border-white\/20,
+html.light .border-white\/10 {
+    border-color: var(--color-border-base) !important;
+}
+
+html.light .border-white\/5 {
+    border-color: var(--color-border-subtle) !important;
+}
+
+html.light .bg-white\/5 {
+    background-color: var(--color-btn-secondary-bg) !important;
+}
+
+html.light .bg-white\/10 {
+    background-color: var(--color-btn-secondary-hover-bg) !important;
+}
+
+/* 8. Secondary Buttons & Interactive Hover States in Light Mode */
+html.light .btn-secondary,
+html.light .btn-logout,
+html.light .btn-close {
+    background-color: var(--color-btn-secondary-bg) !important;
+    border-color: var(--color-btn-secondary-border) !important;
+    color: var(--color-btn-secondary-text) !important;
+}
+
+html.light .btn-secondary *,
+html.light .btn-logout *,
+html.light .btn-close * {
+    color: inherit !important;
+}
+
+html.light .btn-secondary:hover,
+html.light .btn-logout:hover,
+html.light .btn-close:hover {
+    background-color: var(--color-btn-secondary-hover-bg) !important;
+    color: var(--color-btn-secondary-hover-text) !important;
+}
+
+/* Ghost button (Learn How It Works) */
+html.light .btn-ghost {
+    color: var(--color-text-muted) !important;
+}
+
+html.light .btn-ghost:hover {
+    color: var(--color-primary) !important;
+}
+
+/* Header nav signin link */
+html.light .btn-nav-signin {
+    color: var(--color-text-muted) !important;
+}
+
+html.light .btn-nav-signin:hover {
+    color: var(--color-text-title) !important;
+}
+
+/* Prevent unwanted white text on general hover in light mode */
+html.light .hover\:text-white:hover {
+    color: var(--color-text-title) !important;
+}
+
+html.light .hover\:bg-white\/10:hover,
+html.light .hover\:bg-white\/5:hover {
+    background-color: var(--color-btn-secondary-hover-bg) !important;
+}
+
+/* 9. Landing Page CTA Section in Light Mode */
+html.light #cta > div {
+    background-color: var(--color-bg-surface) !important;
+    background-image: none !important;
+    border-color: var(--color-border-base) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+html.light #cta h2 {
+    color: var(--color-text-title) !important;
+}
+
+html.light #cta p {
+    color: var(--color-text-muted) !important;
+}
+
+/* 10. Hero Auth Card in Light Mode */
+html.light #hero-auth-card {
+    background-color: var(--color-bg-surface) !important;
+    border-color: var(--color-border-base) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light #hero-auth-card .bg-slate-900 {
+    background-color: var(--color-bg-elevated) !important;
+    border-color: var(--color-border-base) !important;
+}
+
+html.light #tab-signin-btn:not(.bg-orange-600),
+html.light #tab-signup-btn:not(.bg-orange-600) {
+    color: var(--color-text-muted) !important;
+}
+
+html.light #tab-signin-btn:not(.bg-orange-600):hover,
+html.light #tab-signup-btn:not(.bg-orange-600):hover {
+    color: var(--color-text-title) !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Form error callouts in light mode */
+html.light div[class*="border-orange-500/40"] {
+    background-color: #fff7ed !important;
+    border-color: rgba(249, 115, 22, 0.4) !important;
+    color: #c2410c !important;
+}
+
+/* 11. Interactive Demo Rating Buttons & Output in Light Mode */
+html.light section#demo .outcome-btn {
+    background-color: var(--color-bg-surface) !important;
+    border-color: var(--color-border-base) !important;
+    color: var(--color-text-body) !important;
+}
+
+html.light section#demo .outcome-btn:hover {
+    border-color: var(--color-primary-subtle-border) !important;
+    background-color: #fffaf5 !important;
+    color: var(--color-text-title) !important;
+}
+
+html.light section#demo .outcome-btn.ring-orange-500\/30 {
+    border-color: var(--color-primary) !important;
+    background-color: #fff7ed !important;
+    color: var(--color-text-title) !important;
+}
+
+html.light #demo-result {
+    background-color: var(--color-bg-surface) !important;
+    border-color: var(--color-primary-subtle-border) !important;
+    box-shadow: 0 4px 15px -2px rgba(249, 115, 22, 0.12) !important;
+    color: var(--color-text-body) !important;
+}
+
+html.light #demo-result strong {
+    color: var(--color-text-title) !important;
+}
+
+html.light button.btn-reveal,
+html.light button[onclick*="toggleReveal"] {
+    background-color: var(--color-btn-secondary-bg) !important;
+    border-color: var(--color-btn-secondary-border) !important;
+    color: var(--color-text-muted) !important;
+}
+
+html.light button.btn-reveal:hover,
+html.light button[onclick*="toggleReveal"]:hover {
+    background-color: #fff7ed !important;
+    border-color: var(--color-primary-subtle-border) !important;
+    color: var(--color-primary) !important;
+}
+
+html.light button.btn-reveal.bg-orange-500\/20,
+html.light button[onclick*="toggleReveal"].bg-orange-500\/20 {
+    background-color: #ffedd5 !important;
+    border-color: var(--color-primary-hover) !important;
+    color: var(--color-primary) !important;
+}
+
+/* 12. Floating Toast Notifications in Light Mode */
+html.light .toast-item {
+    background-color: var(--color-toast-bg) !important;
+    background: var(--color-toast-bg) !important;
+    border-color: var(--color-toast-border) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.05) !important;
+    color: var(--color-toast-text) !important;
+}
+
+html.light .toast-item .leading-relaxed {
+    color: var(--color-toast-text) !important;
+    font-weight: 600 !important;
+}
+
+html.light .toast-item button {
+    color: var(--color-text-faint) !important;
+}
+
+html.light .toast-item button:hover {
+    color: var(--color-text-title) !important;
+}
+
+/* 13. Dashboard Specific Light Mode Elements */
+html.light #problems-container {
+    background-color: var(--color-bg-surface) !important;
+    border-color: var(--color-border-base) !important;
+    box-shadow: var(--color-card-shadow) !important;
+}
+
+html.light #problems-container .divide-white\/5 > * {
+    border-color: var(--color-border-subtle) !important;
+}
+
+html.light div.font-mono:has(> button.px-2\.5) {
+    background-color: var(--color-bg-surface) !important;
+    border-color: var(--color-border-base) !important;
+}
+
+html.light div.font-mono > button.px-2\.5:not(.bg-orange-600) {
+    color: var(--color-text-muted) !important;
+}
+
+html.light div.font-mono > button.px-2\.5:not(.bg-orange-600):hover {
+    color: var(--color-text-title) !important;
+    background-color: var(--color-bg-elevated) !important;
+}
+
+html.light #addProblemModal > div {
+    background-color: var(--color-modal-bg) !important;
+    border-color: var(--color-modal-border) !important;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.light #addProblemModal select option {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+
+/* 14. Footer in Light Mode */
+html.light footer {
+    background-color: var(--color-bg-elevated) !important;
+    border-top: 1px solid var(--color-border-base) !important;
+}
+
+/* Scrollbars */
 ::-webkit-scrollbar {
     width: 7px;
     height: 7px;
 }
 ::-webkit-scrollbar-track {
-    background: #0b0f17;
+    background: var(--scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-    background: #1e293b;
+    background: var(--scrollbar-thumb);
     border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* ==========================================================================
+   15. PRIMARY ORANGE BUTTON WHITE TEXT ENFORCEMENT (ABSOLUTE HIGHEST SPECIFICITY)
+   Guarantees that all primary action buttons stay pure white in both dark and light modes,
+   while never touching secondary or neutral buttons.
+   ========================================================================== */
+.bg-orange-600,
+.bg-orange-500,
+.btn-primary,
+button.bg-orange-600,
+button.bg-orange-500,
+a.bg-orange-600,
+a.bg-orange-500,
+html.light .bg-orange-600,
+html.light .bg-orange-500,
+html.light .btn-primary,
+html.light button.bg-orange-600,
+html.light button.bg-orange-500,
+html.light a.bg-orange-600,
+html.light a.bg-orange-500,
+.bg-orange-600 *,
+.bg-orange-500 *,
+.btn-primary *,
+button.bg-orange-600 *,
+button.bg-orange-500 *,
+a.bg-orange-600 *,
+a.bg-orange-500 *,
+html.light .bg-orange-600 *,
+html.light .bg-orange-500 *,
+html.light .btn-primary *,
+html.light button.bg-orange-600 *,
+html.light button.bg-orange-500 *,
+html.light a.bg-orange-600 *,
+html.light a.bg-orange-500 * {
+    color: #ffffff !important;
+    fill: #ffffff !important;
 }

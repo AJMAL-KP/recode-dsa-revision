@@ -3,19 +3,20 @@ from django.contrib.auth import get_user_model
 
 
 class EmailBackend(ModelBackend):
-    """Authenticate using email address instead of username."""
+    """Authenticate using case-insensitive email address and password."""
+
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         email = kwargs.get('email', username)
-        if not email:
+        if not email or not password:
             return None
+
+        email = email.strip()
         try:
             user = UserModel.objects.filter(email__iexact=email).first()
-            if not user:
-                # Also try matching username in case someone used username
-                user = UserModel.objects.filter(username__iexact=email).first()
-            if user and user.check_password(password):
-                return user
-        except Exception:
+        except UserModel.DoesNotExist:
             return None
+
+        if user and user.check_password(password) and self.user_can_authenticate(user):
+            return user
         return None
