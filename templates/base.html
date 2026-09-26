@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ReCode - Spaced Repetition LeetCode Revision Assistant{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}A spaced-repetition revision assistant for LeetCode and DSA preparation. Never forget algorithmic patterns and solved problems again.{% endblock %}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                            950: '#431407',
+                        },
+                        dark: {
+                            bg: '#0b0f17',
+                            card: '#101623',
+                            surface: '#182030',
+                            border: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-[#0b0f17] text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+    <!-- Navigation Header -->
+    <nav class="sticky top-0 z-50 bg-[#0b0f17]/95 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'landing' %}" class="flex flex-col">
+                        <span class="font-bold text-lg tracking-tight text-white flex items-center">
+                            Re<span class="text-orange-500">Code</span>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Auth / User Actions -->
+                <div class="flex items-center gap-3">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center gap-1.5">
+                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{% url 'logout' %}" class="p-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors" title="Sign out">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 transition-colors">
+                            Sign In
+                        </a>
+                        <a href="{% url 'register' %}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-colors">
+                            Get Started
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Messages -->
+    {% if messages %}
+    <div class="max-w-4xl mx-auto px-4 mt-3 w-full z-40">
+        {% for message in messages %}
+        <div class="p-3 rounded-lg mb-2 flex items-center gap-2.5 text-xs font-medium border shadow-sm
+            {% if message.tags == 'error' %}
+                bg-rose-950/60 border-rose-500/30 text-rose-200
+            {% elif message.tags == 'success' %}
+                bg-emerald-950/60 border-emerald-500/30 text-emerald-200
+            {% else %}
+                bg-slate-900 border-orange-500/30 text-orange-200
+            {% endif %}">
+            <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+            <span class="flex-1">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% block footer %}
+    <footer class="mt-auto border-t border-white/10 bg-[#080b11] py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
+                <div class="md:col-span-2">
+                    <div class="mb-2">
+                        <span class="font-bold text-base text-white">Re<span class="text-orange-500">Code</span></span>
+                    </div>
+                    <p class="text-slate-400 text-xs max-w-sm leading-relaxed">
+                        A spaced-repetition revision assistant for LeetCode and DSA preparation. Helping you retain previously solved problems and recognize core algorithmic patterns.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Core Pillars</h4>
+                    <div class="space-y-1.5 text-xs text-slate-400">
+                        <div>Active Recall</div>
+                        <div>Adaptive Spaced Repetition</div>
+                        <div>Strict Daily Quota Protection</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Workflow</h4>
+                    <div class="space-y-1.5 text-xs text-slate-400">
+                        <div>Add Solved Problems</div>
+                        <div>Progressive Cues & Notes</div>
+                        <div>Performance-Based Intervals</div>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+                <p>&copy; 2026 ReCode. Built for DSA retention.</p>
+                <div class="flex items-center gap-2 text-slate-400 text-[11px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>Spaced Repetition Active</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script>
+        lucide.createIcons();
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
