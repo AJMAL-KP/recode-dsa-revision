@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}ReCode - Spaced Repetition LeetCode Revision Assistant{% endblock %}
+{% block title %}ReCode - Spaced Repetition DSA Revision Assistant{% endblock %}
 
 {% block content %}
+{% if user.is_authenticated %}
+<script>
+    window.location.replace("{% url 'dashboard' %}");
+</script>
+{% endif %}
 <div class="relative overflow-hidden">
 
     <!-- Section 1: Hero (Full Screen Split View) -->
@@ -14,9 +19,8 @@
                 <!-- Left Column: Hero Copy & Description -->
                 <div class="lg:col-span-7 space-y-6 text-left">
                     <!-- Pill Badge -->
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-xs font-semibold">
-                        <span class="flex h-1.5 w-1.5 rounded-full bg-orange-500"></span>
-                        <span>Spaced Repetition &middot; Active Recall &middot; Overdue Protection</span>
+                    <div class="inline-flex items-center px-3.5 py-1 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-xs font-semibold">
+                        <span>Spaced Repetition &middot; Active Recall &middot; FSRS Scheduler</span>
                     </div>
 
                     <!-- Main Headline -->
@@ -27,49 +31,26 @@
 
                     <!-- Subtitle -->
                     <p class="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed font-normal">
-                        ReCode automatically schedules adaptive revisions so you retain algorithmic observations and patterns without feeling overwhelmed by backlogs.
+                        A spaced-repetition revision assistant for DSA problems. Retain algorithmic patterns, recognition cues, and personal notes with active recall and adaptive FSRS scheduling.
                     </p>
 
                     <!-- Interactive Demo Jump Button -->
                     <div class="pt-2 flex items-center gap-4">
-                        <a href="#demo" class="px-5 py-3 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-white/10 hover:border-white/20 flex items-center gap-2 transition-colors">
-                            <i data-lucide="play" class="w-3.5 h-3.5 text-orange-400 fill-current"></i>
+                        <button type="button" onclick="scrollToCenter('demo')" class="px-5 py-3 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 flex items-center gap-2 transition-colors shadow-lg shadow-orange-600/20">
                             <span>Try Interactive Demo</span>
-                        </a>
-                        <a href="#features" class="text-xs font-medium text-slate-400 hover:text-white transition-colors">
-                            Learn How It Works &rarr;
-                        </a>
+                        </button>
+                        <button type="button" onclick="scrollToCenter('features')" class="btn-ghost group text-xs font-semibold text-slate-400 hover:text-orange-500 dark:hover:text-orange-400 flex items-center gap-1.5 transition-all" title="Learn How It Works">
+                            <span>Learn How It Works</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1"></i>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Right Column: Constant Size Sign In / Sign Up Card -->
                 <div class="lg:col-span-5 flex justify-center lg:justify-end">
-                    <div class="w-full max-w-sm h-[400px] bg-[#101623] rounded-2xl border border-white/10 p-6 shadow-2xl flex flex-col justify-between">
-                        
-                        {% if user.is_authenticated %}
-                            <!-- Authenticated State -->
-                            <div class="flex flex-col justify-between h-full py-4 text-center">
-                                <div>
-                                    <div class="w-12 h-12 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-3">
-                                        <i data-lucide="user-check" class="w-6 h-6"></i>
-                                    </div>
-                                    <h3 class="text-base font-bold text-white">Signed In</h3>
-                                    <p class="text-xs text-slate-400 mt-1 font-mono break-all">{{ user.email }}</p>
-                                </div>
-
-                                <div class="space-y-3">
-                                    <a href="{% url 'dashboard' %}" class="w-full py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center gap-2 shadow-sm">
-                                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                                        <span>Open Revision Dashboard</span>
-                                    </a>
-                                    <a href="{% url 'logout' %}" class="text-xs text-slate-500 hover:text-slate-300 block transition-colors">
-                                        Sign Out
-                                    </a>
-                                </div>
-                            </div>
-                        {% else %}
-                            <!-- Unauthenticated State: Tabbed Sign In / Sign Up (Constant Card Size) -->
-                            <div>
+                    <div id="hero-auth-card" class="w-full max-w-sm min-h-[420px] bg-[#101623] rounded-2xl border border-white/10 p-6 shadow-2xl flex flex-col justify-between">
+                        <!-- Tabbed Sign In / Sign Up -->
+                        <div>
                                 <!-- Tabs Header -->
                                 <div class="grid grid-cols-2 p-1 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold mb-5">
                                     <button type="button" id="tab-signin-btn" onclick="switchAuthTab('signin')" class="py-1.5 rounded-md bg-orange-600 text-white shadow-sm transition-all">
@@ -82,20 +63,23 @@
 
                                 <!-- Sign In View -->
                                 <div id="tab-signin-view">
-                                    <form method="post" action="{% url 'login' %}" class="space-y-3.5">
+                                    <form method="post" action="{% url 'login' %}" data-auth-type="signin" novalidate class="space-y-3">
                                         {% csrf_token %}
+
                                         <div>
                                             <label class="block text-[11px] font-medium text-slate-300 mb-1">Email Address</label>
-                                            <input type="email" name="email" placeholder="name@example.com" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                                            <input type="email" name="email" placeholder="name@example.com" value="{{ login_form.email.value|default:saved_email|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-slate-900 border {% if auth_errors.email and active_tab == 'signin' %}border-orange-500{% else %}border-white/10{% endif %} text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none transition-colors" required>
+                                            <p data-error-for="email" class="{% if not auth_errors.email or active_tab != 'signin' %}hidden {% endif %}text-[11px] text-orange-400 mt-1">{{ auth_errors.email|default:'' }}</p>
                                         </div>
 
                                         <div>
                                             <label class="block text-[11px] font-medium text-slate-300 mb-1">Password</label>
-                                            <input type="password" name="password" placeholder="••••••••" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                                            <input type="password" name="password" placeholder="••••••••" class="w-full px-3 py-2 rounded-lg bg-slate-900 border {% if auth_errors.password and active_tab == 'signin' %}border-orange-500{% else %}border-white/10{% endif %} text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none transition-colors" required>
+                                            <p data-error-for="password" class="{% if not auth_errors.password or active_tab != 'signin' %}hidden {% endif %}text-[11px] text-orange-400 mt-1">{{ auth_errors.password|default:'' }}</p>
                                         </div>
 
-                                        <button type="submit" class="w-full py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center gap-2 mt-4 shadow-sm">
-                                            <span>Sign In</span>
+                                        <button type="submit" class="w-full py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-orange-600/20 cursor-pointer">
+                                            <span class="btn-text">Sign In</span>
                                             <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                                         </button>
                                     </form>
@@ -103,37 +87,45 @@
 
                                 <!-- Sign Up View -->
                                 <div id="tab-signup-view" class="hidden">
-                                    <form method="post" action="{% url 'register' %}" class="space-y-3">
+                                    <form method="post" action="{% url 'register' %}" data-auth-type="signup" novalidate class="space-y-2.5">
                                         {% csrf_token %}
+
+                                        <div>
+                                            <label class="block text-[11px] font-medium text-slate-300 mb-1">Full Name</label>
+                                            <input type="text" name="name" placeholder="Alex Morgan" value="{{ register_form.name.value|default:saved_name|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-slate-900 border {% if auth_errors.name and active_tab == 'signup' %}border-orange-500{% else %}border-white/10{% endif %} text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none transition-colors" autocomplete="name" required>
+                                            <p data-error-for="name" class="{% if not auth_errors.name or active_tab != 'signup' %}hidden {% endif %}text-[11px] text-orange-400 mt-1">{{ auth_errors.name|default:'' }}</p>
+                                        </div>
+
                                         <div>
                                             <label class="block text-[11px] font-medium text-slate-300 mb-1">Email Address</label>
-                                            <input type="email" name="email" placeholder="name@example.com" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                                            <input type="email" name="email" placeholder="name@example.com" value="{{ register_form.email.value|default:saved_email|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-slate-900 border {% if auth_errors.email and active_tab == 'signup' %}border-orange-500{% else %}border-white/10{% endif %} text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none transition-colors" autocomplete="email" required>
+                                            <p data-error-for="email" class="{% if not auth_errors.email or active_tab != 'signup' %}hidden {% endif %}text-[11px] text-orange-400 mt-1">{{ auth_errors.email|default:'' }}</p>
                                         </div>
 
                                         <div>
                                             <label class="block text-[11px] font-medium text-slate-300 mb-1">Password</label>
-                                            <input type="password" name="password" placeholder="Choose a password" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                                            <input type="password" name="password" placeholder="At least 8 characters" class="w-full px-3 py-2 rounded-lg bg-slate-900 border {% if auth_errors.password and active_tab == 'signup' %}border-orange-500{% else %}border-white/10{% endif %} text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none transition-colors" autocomplete="new-password" required>
+                                            <p data-error-for="password" class="{% if not auth_errors.password or active_tab != 'signup' %}hidden {% endif %}text-[11px] text-orange-400 mt-1">{{ auth_errors.password|default:'' }}</p>
                                         </div>
 
                                         <div>
                                             <label class="block text-[11px] font-medium text-slate-300 mb-1">Confirm Password</label>
-                                            <input type="password" name="confirm_password" placeholder="Confirm password" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                                            <input type="password" name="confirm_password" placeholder="Confirm password" class="w-full px-3 py-2 rounded-lg bg-slate-900 border {% if auth_errors.confirm_password and active_tab == 'signup' %}border-orange-500{% else %}border-white/10{% endif %} text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none transition-colors" autocomplete="new-password" required>
+                                            <p data-error-for="confirm_password" class="{% if not auth_errors.confirm_password or active_tab != 'signup' %}hidden {% endif %}text-[11px] text-orange-400 mt-1">{{ auth_errors.confirm_password|default:'' }}</p>
                                         </div>
 
-                                        <button type="submit" class="w-full py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center gap-2 shadow-sm">
-                                            <span>Get Started Free</span>
+                                        <button type="submit" class="w-full py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20 cursor-pointer">
+                                            <span class="btn-text">Get Started Free</span>
                                             <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                                         </button>
                                     </form>
                                 </div>
-                            </div>
+                        </div>
 
-                            <!-- Card Footer Text -->
-                            <div class="pt-3 border-t border-white/5 text-center text-[11px] text-slate-400">
-                                Spaced repetition &middot; Active recall
-                            </div>
-                        {% endif %}
-
+                        <!-- Card Footer Text -->
+                        <div class="pt-3 border-t border-white/5 text-center text-[11px] text-slate-400">
+                            Active recall &middot; FSRS spaced repetition
+                        </div>
                     </div>
                 </div>
 
@@ -141,249 +133,309 @@
         </div>
     </section>
 
-    <!-- Section 2: Interactive Active Recall Demo -->
-    <section id="demo" class="scroll-mt-8 min-h-[calc(100vh-3.5rem)] flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-16 border-t border-white/5 relative z-10">
+    <!-- Section 2: Interactive Active Recall Demo (3-Color Palette: Orange, White, Slate) -->
+    <section id="demo" class="min-h-[calc(100vh-3.5rem)] flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <div class="max-w-4xl mx-auto w-full">
             <div class="text-center mb-8">
                 <span class="text-xs font-mono uppercase tracking-wider text-orange-400 font-semibold">Live Interactive Demo</span>
                 <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Experience Active Recall In Action</h2>
                 <p class="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto mt-1.5">
-                    Reveal hints progressively from high-level pattern down to specific notes and edge cases.
+                    Attempt recall before revealing recognition cues, patterns, mistakes, and personal notes.
                 </p>
             </div>
 
             <!-- Demo Card Container -->
-            <div class="bg-[#101623] rounded-2xl p-6 sm:p-7 border border-white/10 shadow-xl">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded text-xs font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Easy</span>
-                            <span class="text-xs font-mono text-slate-400">Problem #1</span>
-                            <span class="text-xs px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30">Pattern: Hashing</span>
+            <div id="demo-card-box" class="bg-[#101623] rounded-2xl p-6 sm:p-7 border border-white/10 shadow-xl transition-all duration-300">
+                <!-- Active Problem Card View -->
+                <div id="demo-active-view">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span id="demo-difficulty-badge" class="px-2.5 py-0.5 rounded text-xs font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">Easy</span>
+                                <span id="demo-number-badge" class="text-xs font-mono text-slate-400">Problem #1</span>
+                                <span id="demo-pattern-badge" class="px-2.5 py-0.5 rounded text-xs font-mono text-orange-400 bg-orange-500/10 border border-orange-500/20 font-medium">Pattern: Hashing</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white mt-2 flex items-center gap-2">
+                                <span id="demo-title">Two Sum</span>
+                                <a id="demo-problem-link" href="https://leetcode.com/problems/two-sum/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs text-orange-400 hover:text-orange-300 font-mono transition-colors ml-1" title="View Problem">
+                                    <span>Problem Link</span>
+                                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </h3>
                         </div>
-                        <h3 class="text-lg font-bold text-white mt-1.5 flex items-center gap-2">
-                            Two Sum
-                            <a href="https://leetcode.com/problems/two-sum/" target="_blank" class="text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1 font-mono">
-                                LeetCode
-                            </a>
-                        </h3>
+
+                        <div class="text-left sm:text-right w-full sm:w-auto bg-slate-900/80 p-2.5 rounded-lg border border-white/10">
+                            <div class="text-xs text-slate-400 font-mono">Revision Count: <span id="demo-rev-count" class="font-bold text-orange-400">3</span></div>
+                        </div>
                     </div>
 
-                    <div class="text-left sm:text-right w-full sm:w-auto bg-slate-900 p-2 rounded-lg border border-white/5">
-                        <div class="text-xs text-slate-400 font-mono">Current Revision Level: <span id="demo-level-display" class="font-bold text-orange-400">Level 2 (7 days)</span></div>
-                        <div class="text-[11px] text-slate-500 mt-0.5 font-mono">Attempted: 3 times - Streak: 2</div>
+                    <!-- Progressive Reveal Cues -->
+                    <div class="py-4 space-y-3">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            Step 1: Progressive Reveal (Reveal Only What You Need)
+                        </p>
+
+                        <!-- Cue 1: Recognition Cue -->
+                        <div class="bg-slate-900/90 rounded-xl p-3.5 border border-white/10">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-xs font-semibold text-white">
+                                    1. Recognition Cue
+                                </span>
+                                <button type="button" onclick="toggleReveal('cue-content', this)" class="btn-reveal h-8 w-36 shrink-0 text-xs font-medium rounded-lg bg-white/5 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 border border-white/10 hover:border-orange-500/30 transition-all flex items-center justify-center">
+                                    Reveal Cue
+                                </button>
+                            </div>
+                            <div id="cue-content" class="hidden mt-2.5 pt-2.5 border-t border-white/10 text-xs text-slate-300 leading-relaxed font-mono bg-slate-950/70 p-3 rounded-lg border border-white/5">
+                                "Need constant-time lookup while traversing."
+                            </div>
+                        </div>
+
+                        <!-- Cue 2: Algorithmic Pattern -->
+                        <div class="bg-slate-900/90 rounded-xl p-3.5 border border-white/10">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-xs font-semibold text-white">
+                                    2. Algorithmic Pattern
+                                </span>
+                                <button type="button" onclick="toggleReveal('pattern-content', this)" class="btn-reveal h-8 w-36 shrink-0 text-xs font-medium rounded-lg bg-white/5 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 border border-white/10 hover:border-orange-500/30 transition-all flex items-center justify-center">
+                                    Reveal Pattern
+                                </button>
+                            </div>
+                            <div id="pattern-content" class="hidden mt-2.5 pt-2.5 border-t border-white/10 text-xs text-slate-300 leading-relaxed font-mono bg-slate-950/70 p-3 rounded-lg border border-white/5">
+                                Hashing &middot; Store seen elements in a Hash Map for O(1) complement lookup.
+                            </div>
+                        </div>
+
+                        <!-- Cue 3: Previous Mistakes & Traps -->
+                        <div class="bg-slate-900/90 rounded-xl p-3.5 border border-white/10">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-xs font-semibold text-white">
+                                    3. Previous Mistakes & Traps
+                                </span>
+                                <button type="button" onclick="toggleReveal('mistake-content', this)" class="btn-reveal h-8 w-36 shrink-0 text-xs font-medium rounded-lg bg-white/5 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 border border-white/10 hover:border-orange-500/30 transition-all flex items-center justify-center">
+                                    Reveal Mistakes
+                                </button>
+                            </div>
+                            <div id="mistake-content" class="hidden mt-2.5 pt-2.5 border-t border-white/10 text-xs text-slate-300 leading-relaxed font-mono bg-slate-950/70 p-3 rounded-lg border border-white/5">
+                                "Initially considered nested loops. Watch out: cannot use the exact same element twice."
+                            </div>
+                        </div>
+
+                        <!-- Cue 4: Personal Notes & Observations -->
+                        <div class="bg-slate-900/90 rounded-xl p-3.5 border border-white/10">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-xs font-semibold text-white">
+                                    4. Personal Notes & Observations
+                                </span>
+                                <button type="button" onclick="toggleReveal('notes-content', this)" class="btn-reveal h-8 w-36 shrink-0 text-xs font-medium rounded-lg bg-white/5 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 border border-white/10 hover:border-orange-500/30 transition-all flex items-center justify-center">
+                                    Reveal Notes
+                                </button>
+                            </div>
+                            <div id="notes-content" class="hidden mt-2.5 pt-2.5 border-t border-white/10 text-xs text-slate-300 leading-relaxed font-mono bg-slate-950/70 p-3 rounded-lg border border-white/5">
+                                "Store the complement while traversing. Single pass: check complement presence before inserting."
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Rate Performance -->
+                    <div class="pt-4 border-t border-white/10">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                            Step 2: How well did you recall?
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="demo-ratings-group">
+                            <!-- Option 1: Forgot (Purple / Magenta) -->
+                            <button type="button" id="btn-rating-forgot" onclick="selectDemoRating('forgot')" class="demo-rating-btn w-full p-3.5 rounded-xl border border-white/10 hover:border-purple-500/40 bg-slate-900/90 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer">
+                                <div class="text-purple-600 dark:text-purple-400 font-bold text-xs">
+                                    Forgot
+                                </div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Needed solution to proceed.</div>
+                            </button>
+
+                            <!-- Option 2: Hard (LeetCode Red / Rose) -->
+                            <button type="button" id="btn-rating-hard" onclick="selectDemoRating('hard')" class="demo-rating-btn w-full p-3.5 rounded-xl border border-white/10 hover:border-rose-500/40 bg-slate-900/90 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer">
+                                <div class="text-rose-600 dark:text-rose-400 font-bold text-xs">
+                                    Hard
+                                </div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Needed hints or notes.</div>
+                            </button>
+
+                            <!-- Option 3: Medium (LeetCode Amber / Yellow) -->
+                            <button type="button" id="btn-rating-medium" onclick="selectDemoRating('medium')" class="demo-rating-btn w-full p-3.5 rounded-xl border border-white/10 hover:border-amber-500/40 bg-slate-900/90 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer">
+                                <div class="text-amber-600 dark:text-amber-400 font-bold text-xs">
+                                    Medium
+                                </div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Solved independently, took effort.</div>
+                            </button>
+
+                            <!-- Option 4: Easy (LeetCode Emerald / Green) -->
+                            <button type="button" id="btn-rating-easy" onclick="selectDemoRating('easy')" class="demo-rating-btn w-full p-3.5 rounded-xl border border-white/10 hover:border-emerald-500/40 bg-slate-900/90 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer">
+                                <div class="text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+                                    Easy
+                                </div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Solved independently, quickly, no effort.</div>
+                            </button>
+                        </div>
+
+                        <!-- Demo Action Controls (Submit/Done & Reset Buttons) -->
+                        <div class="mt-4 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div class="text-xs text-slate-400 font-mono flex items-center gap-2">
+                                <span id="demo-status-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                                <span id="demo-action-feedback">Select your recall outcome above to proceed</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                                <button type="button" onclick="resetDemo()" class="px-4 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5 cursor-pointer">
+                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                    <span>Reset Demo</span>
+                                </button>
+                                <button type="button" id="demo-next-btn" onclick="submitDemoReview()" disabled class="px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center gap-1.5 shadow-lg shadow-orange-600/20 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+                                    <span id="demo-submit-btn-text">Submit</span>
+                                    <i id="demo-submit-btn-icon" data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Progressive Reveal Cues in Requested Order -->
-                <div class="py-4 space-y-3">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                        <i data-lucide="eye" class="w-3.5 h-3.5 text-orange-400"></i>
-                        <span>Step 1: Progressive Cues (Reveal Only What You Need)</span>
+                <!-- Completed View (Shown after finishing the last problem card) -->
+                <div id="demo-completed-view" class="hidden text-center py-6 sm:py-8">
+                    <div class="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/10">
+                        <i data-lucide="check-circle-2" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white">Revision Session Complete!</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto mt-2 leading-relaxed">
+                        You've revised all demo problems. In ReCode, FSRS dynamically calculates recall stability and schedules each card for future revision when memory decay begins.
                     </p>
 
-                    <!-- Cue 1: Pattern Cue (First) -->
-                    <div class="bg-slate-900 rounded-lg p-3 border border-white/5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-orange-300 flex items-center gap-1.5">
-                                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-                                1. Algorithmic Pattern
-                            </span>
-                            <button type="button" onclick="toggleReveal('pattern-content', this)" class="text-xs font-medium px-2.5 py-0.5 rounded bg-orange-600/20 hover:bg-orange-600/30 text-orange-200 border border-orange-500/30 transition-colors">
-                                Reveal Pattern
-                            </button>
-                        </div>
-                        <div id="pattern-content" class="hidden mt-2 pt-2 border-t border-white/5 text-xs text-slate-200 leading-relaxed font-mono bg-slate-950/60 p-2 rounded">
-                            Hash Map / Complement lookup in O(N) time and O(N) space.
-                        </div>
-                    </div>
-
-                    <!-- Cue 2: Recognition Cue (Second) -->
-                    <div class="bg-slate-900 rounded-lg p-3 border border-white/5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                                <i data-lucide="key" class="w-3.5 h-3.5 text-orange-400"></i>
-                                2. Recognition Cue
-                            </span>
-                            <button type="button" onclick="toggleReveal('cue-content', this)" class="text-xs font-medium px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 transition-colors">
-                                Reveal Cue
-                            </button>
-                        </div>
-                        <div id="cue-content" class="hidden mt-2 pt-2 border-t border-white/5 text-xs text-slate-200 leading-relaxed font-mono bg-slate-950/60 p-2 rounded">
-                            "Need constant-time O(1) lookup of the complement (target - num) while iterating through the array in a single pass."
-                        </div>
-                    </div>
-
-                    <!-- Cue 3: Personal Notes Cue (Third) -->
-                    <div class="bg-slate-900 rounded-lg p-3 border border-white/5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-cyan-300 flex items-center gap-1.5">
-                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                                3. Personal Notes & Observations
-                            </span>
-                            <button type="button" onclick="toggleReveal('notes-content', this)" class="text-xs font-medium px-2.5 py-0.5 rounded bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-200 border border-cyan-500/30 transition-colors">
-                                Reveal Notes
-                            </button>
-                        </div>
-                        <div id="notes-content" class="hidden mt-2 pt-2 border-t border-white/5 text-xs text-slate-200 leading-relaxed font-mono bg-slate-950/60 p-2 rounded">
-                            "Store seen elements as {value: index}. Check if (target - current_val) exists in map before inserting current element."
-                        </div>
-                    </div>
-
-                    <!-- Cue 4: Previous Mistakes & Traps (Fourth) -->
-                    <div class="bg-slate-900 rounded-lg p-3 border border-white/5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-rose-300 flex items-center gap-1.5">
-                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
-                                4. Previous Mistakes and Traps
-                            </span>
-                            <button type="button" onclick="toggleReveal('mistake-content', this)" class="text-xs font-medium px-2.5 py-0.5 rounded bg-rose-600/20 hover:bg-rose-600/30 text-rose-200 border border-rose-500/30 transition-colors">
-                                Reveal Pitfall
-                            </button>
-                        </div>
-                        <div id="mistake-content" class="hidden mt-2 pt-2 border-t border-white/5 text-xs text-slate-200 leading-relaxed font-mono bg-slate-950/60 p-2 rounded">
-                            "Initially considered nested loops O(N^2). Watch out: You cannot use the same element twice (check index i != map[complement])."
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Rate Performance -->
-                <div class="pt-4 border-t border-white/10">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
-                        <i data-lucide="gauge" class="w-3.5 h-3.5 text-orange-400"></i>
-                        <span>Step 2: How did your active recall attempt go?</span>
-                    </p>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <button type="button" onclick="simulateOutcome('independent')" class="p-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 text-left transition-colors">
-                            <div class="flex items-center justify-between text-emerald-300 font-bold text-xs">
-                                <span>Independent</span>
-                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20">+1 Level</span>
+                    <!-- Problem Specific Revision Count Summary -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-6 max-w-xl mx-auto text-left">
+                        <div class="bg-slate-900/90 rounded-xl p-3.5 border border-white/10">
+                            <div class="text-[11px] font-mono text-slate-400">#1 &middot; <span class="text-emerald-400 font-semibold">Easy</span></div>
+                            <div class="text-xs font-bold text-white mt-1">Two Sum</div>
+                            <div class="text-[11px] font-mono text-orange-400 font-semibold mt-2">
+                                <span id="summary-rev-0">4</span> Revisions
                             </div>
-                            <div class="text-[11px] text-slate-400 mt-1">Solved without hints. Next: <strong class="text-emerald-300 font-mono">14 days</strong></div>
-                        </button>
-
-                        <button type="button" onclick="simulateOutcome('hint')" class="p-3 rounded-lg border border-amber-500/30 bg-amber-950/20 hover:bg-amber-950/40 text-left transition-colors">
-                            <div class="flex items-center justify-between text-amber-300 font-bold text-xs">
-                                <span>Needed Hint</span>
-                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20">Same Level</span>
+                        </div>
+                        <div class="bg-slate-900/90 rounded-xl p-3.5 border border-white/10">
+                            <div class="text-[11px] font-mono text-slate-400">#704 &middot; <span class="text-emerald-400 font-semibold">Easy</span></div>
+                            <div class="text-xs font-bold text-white mt-1">Binary Search</div>
+                            <div class="text-[11px] font-mono text-orange-400 font-semibold mt-2">
+                                <span id="summary-rev-1">3</span> Revisions
                             </div>
-                            <div class="text-[11px] text-slate-400 mt-1">Needed cue/pattern. Next: <strong class="text-amber-300 font-mono">7 days</strong></div>
-                        </button>
-
-                        <button type="button" onclick="simulateOutcome('forgot')" class="p-3 rounded-lg border border-rose-500/30 bg-rose-950/20 hover:bg-rose-950/40 text-left transition-colors">
-                            <div class="flex items-center justify-between text-rose-300 font-bold text-xs">
-                                <span>Forgot</span>
-                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20">Reset to L1</span>
+                        </div>
+                        <div class="bg-slate-900/90 rounded-xl p-3.5 border border-white/10">
+                            <div class="text-[11px] font-mono text-slate-400">#146 &middot; <span class="text-amber-400 font-semibold">Medium</span></div>
+                            <div class="text-xs font-bold text-white mt-1">LRU Cache</div>
+                            <div class="text-[11px] font-mono text-orange-400 font-semibold mt-2">
+                                <span id="summary-rev-2">6</span> Revisions
                             </div>
-                            <div class="text-[11px] text-slate-400 mt-1">Blanked out. Next: <strong class="text-rose-300 font-mono">3 days</strong></div>
-                        </button>
+                        </div>
                     </div>
 
-                    <!-- Simulation Output Toast -->
-                    <div id="demo-result" class="hidden mt-3 p-2.5 rounded bg-slate-900 border border-orange-500/30 text-xs font-mono text-orange-200 flex items-center justify-between">
-                        <span id="demo-result-text"></span>
-                        <button type="button" onclick="resetDemo()" class="text-orange-400 hover:text-white underline text-[11px]">Reset Sandbox</button>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                        <button type="button" onclick="resetDemo()" class="w-full sm:w-auto px-5 py-2.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            <span>Restart Demo</span>
+                        </button>
+                        <button type="button" onclick="scrollToAuth('signup')" class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-orange-600/25 cursor-pointer">
+                            <span>Create Free Account</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 3: Features Grid -->
-    <section id="features" class="scroll-mt-8 min-h-[calc(100vh-3.5rem)] flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-white/5 relative z-10">
+    <!-- Section 3: Features Grid (Strict 3-Color Palette) -->
+    <section id="features" class="min-h-[calc(100vh-3.5rem)] flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-12">
             <span class="text-xs font-mono uppercase tracking-wider text-orange-400 font-semibold">Features</span>
-            <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Engineered for DSA Retention</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Built for Long-Term DSA Retention</h2>
             <p class="text-slate-400 text-xs sm:text-sm mt-1.5">
-                Focused tools to turn solved questions into permanent, reflex-level patterns.
+                Retain patterns, cues, and observations through active recall and adaptive scheduling.
             </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div class="bg-[#101623] p-5 rounded-xl border border-white/10 shadow-lg">
-                <div class="w-9 h-9 rounded-lg bg-orange-600/20 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-3">
+            <div class="bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-3">
+                    <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-1">Adaptive Spaced Repetition</h3>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    Revision intervals automatically adapt based on your recall outcomes—no arbitrary fixed intervals or rigid daily quotas.
+                </p>
+            </div>
+
+            <div class="bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-3">
                     <i data-lucide="eye-off" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-sm font-bold text-white mb-1">Progressive Reveal Cues</h3>
+                <h3 class="text-sm font-bold text-white mb-1">Active Recall & Cues</h3>
                 <p class="text-slate-400 text-xs leading-relaxed">
-                    Store recognition triggers and personal traps. Reveal only what you need during reviews to enforce mental retrieval.
+                    Attempt to reconstruct the solution before revealing assistance. Progressively reveal recognition cues, patterns, and notes.
                 </p>
             </div>
 
-            <div class="bg-[#101623] p-5 rounded-xl border border-white/10 shadow-lg">
-                <div class="w-9 h-9 rounded-lg bg-orange-600/20 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-3">
-                    <i data-lucide="sliders" class="w-4 h-4"></i>
-                </div>
-                <h3 class="text-sm font-bold text-white mb-1">Custom Daily Quotas</h3>
-                <p class="text-slate-400 text-xs leading-relaxed">
-                    Set your preferred daily workload (5, 10, 15, or custom). ReCode guarantees you will never be overwhelmed by a massive backlog.
-                </p>
-            </div>
-
-            <div class="bg-[#101623] p-5 rounded-xl border border-white/10 shadow-lg">
-                <div class="w-9 h-9 rounded-lg bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-3">
+            <div class="bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-3">
                     <i data-lucide="pie-chart" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-sm font-bold text-white mb-1">Pattern-Level Analytics</h3>
+                <h3 class="text-sm font-bold text-white mb-1">Pattern Recall Tracking</h3>
                 <p class="text-slate-400 text-xs leading-relaxed">
-                    Track recall rates across Arrays, Sliding Window, DP, Graphs, and Trees to immediately diagnose pattern weaknesses.
+                    Track which DSA patterns are being remembered effectively and identify patterns that require more revision across Arrays, Trees, and DP.
                 </p>
             </div>
 
-            <div class="bg-[#101623] p-5 rounded-xl border border-white/10 shadow-lg">
-                <div class="w-9 h-9 rounded-lg bg-rose-600/20 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-3">
+            <div class="bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-3">
                     <i data-lucide="alert-octagon" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-sm font-bold text-white mb-1">Dedicated Mistake Vault</h3>
+                <h3 class="text-sm font-bold text-white mb-1">Recognition Cues & Mistakes</h3>
                 <p class="text-slate-400 text-xs leading-relaxed">
-                    Record subtle edge-case traps and initial incorrect thoughts so you avoid repeating common blunders in interviews.
+                    Capture key observation triggers and document edge-case mistakes so you avoid repeating common blunders in interviews.
                 </p>
             </div>
 
-            <div class="bg-[#101623] p-5 rounded-xl border border-white/10 shadow-lg">
-                <div class="w-9 h-9 rounded-lg bg-amber-600/20 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-3">
+            <div class="bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-3">
                     <i data-lucide="zap" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-sm font-bold text-white mb-1">Streak and Retention Metrics</h3>
+                <h3 class="text-sm font-bold text-white mb-1">Progress Tracking & Streaks</h3>
                 <p class="text-slate-400 text-xs leading-relaxed">
-                    Build daily revision consistency with streak tracking, independent solve ratios, and historical progression logs.
+                    Track revision history and streaks across all four recall ratings: Forgot, Hard, Medium, and Easy.
                 </p>
             </div>
 
-            <div class="bg-[#101623] p-5 rounded-xl border border-white/10 shadow-lg">
-                <div class="w-9 h-9 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-3">
-                    <i data-lucide="external-link" class="w-4 h-4"></i>
+            <div class="bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-3">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-sm font-bold text-white mb-1">LeetCode Integration</h3>
+                <h3 class="text-sm font-bold text-white mb-1">Card-Based Review Interface</h3>
                 <p class="text-slate-400 text-xs leading-relaxed">
-                    Direct links to problem URLs on LeetCode with structured metadata tags for rapid recall sessions.
+                    Focused single-card revision workflow with smooth slide transitions. Revise as many or as few cards as you choose without workload pressure.
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- Section 4: Final Call to Action -->
-    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/5 relative z-10 text-center">
-        <div class="bg-[#101623] p-8 sm:p-10 rounded-2xl border border-white/10 shadow-xl">
-            <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+    <!-- Section 4: Final Call to Action (Redirects to Hero Auth Card) -->
+    <section id="cta" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10 text-center">
+        <div class="bg-white dark:bg-gradient-to-b dark:from-[#101623] dark:to-[#0b0f17] p-8 sm:p-12 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl">
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Stop forgetting the problems you've already solved.
             </h2>
-            <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto mt-2 leading-relaxed">
-                Take control of your DSA revision. Set your daily quota, record your solved problems, and let ReCode handle the memory schedule.
+            <p class="text-slate-600 dark:text-slate-400 text-xs sm:text-sm max-w-xl mx-auto mt-2 leading-relaxed">
+                A spaced-repetition revision assistant for DSA problems. Retain your solved problems through active recall and FSRS scheduling without backlog pressure.
             </p>
-            <div class="mt-6 flex items-center justify-center">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="px-7 py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center gap-2">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                        <span>Go to Dashboard</span>
-                    </a>
-                {% else %}
-                    <a href="{% url 'register' %}" class="px-7 py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center gap-2">
-                        <span>Get Started Free</span>
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                    </a>
-                {% endif %}
+            <div class="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button type="button" onclick="scrollToAuth('signup')" class="btn-primary px-7 py-3 rounded-xl text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-600/25">
+                    <span>Get Started Free</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+                <button type="button" onclick="scrollToAuth('signin')" class="btn-secondary px-5 py-3 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-300/70 dark:border-white/10 transition-colors">
+                    <span>Sign In</span>
+                </button>
             </div>
         </div>
     </section>
@@ -393,20 +445,42 @@
 
 {% block extra_scripts %}
 <script>
+    function scrollToCenter(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function scrollToAuth(tab) {
+        switchAuthTab(tab);
+        const heroCard = document.getElementById('hero-auth-card');
+        if (heroCard) {
+            heroCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                const targetViewId = tab === 'signup' ? 'tab-signup-view' : 'tab-signin-view';
+                const input = document.querySelector(`#${targetViewId} input[name="email"]`);
+                if (input) input.focus();
+            }, 400);
+        }
+    }
+
     function switchAuthTab(tab) {
         const signinBtn = document.getElementById('tab-signin-btn');
         const signupBtn = document.getElementById('tab-signup-btn');
         const signinView = document.getElementById('tab-signin-view');
         const signupView = document.getElementById('tab-signup-view');
 
+        if (!signinBtn || !signupBtn || !signinView || !signupView) return;
+
         if (tab === 'signin') {
-            signinBtn.className = 'py-1.5 rounded-md bg-orange-600 text-white shadow-sm transition-all';
-            signupBtn.className = 'py-1.5 rounded-md text-slate-400 hover:text-white transition-all';
+            signinBtn.className = 'py-1.5 rounded-md bg-orange-600 text-white shadow-sm transition-all cursor-pointer';
+            signupBtn.className = 'py-1.5 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer';
             signinView.classList.remove('hidden');
             signupView.classList.add('hidden');
         } else {
-            signupBtn.className = 'py-1.5 rounded-md bg-orange-600 text-white shadow-sm transition-all';
-            signinBtn.className = 'py-1.5 rounded-md text-slate-400 hover:text-white transition-all';
+            signupBtn.className = 'py-1.5 rounded-md bg-orange-600 text-white shadow-sm transition-all cursor-pointer';
+            signinBtn.className = 'py-1.5 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer';
             signupView.classList.remove('hidden');
             signinView.classList.add('hidden');
         }
@@ -417,46 +491,282 @@
         if (el.classList.contains('hidden')) {
             el.classList.remove('hidden');
             btn.textContent = 'Hide';
-            btn.classList.add('bg-slate-700');
+            btn.className = 'btn-reveal h-8 w-36 shrink-0 text-xs font-medium rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/40 transition-all flex items-center justify-center';
         } else {
             el.classList.add('hidden');
-            btn.textContent = 'Reveal';
-            btn.classList.remove('bg-slate-700');
+            btn.textContent = id === 'pattern-content' ? 'Reveal Pattern' : (id === 'cue-content' ? 'Reveal Cue' : (id === 'notes-content' ? 'Reveal Notes' : 'Reveal Mistakes'));
+            btn.className = 'btn-reveal h-8 w-36 shrink-0 text-xs font-medium rounded-lg bg-white/5 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 border border-white/10 hover:border-orange-500/30 transition-all flex items-center justify-center';
         }
     }
 
-    function simulateOutcome(outcome) {
-        const resultBox = document.getElementById('demo-result');
-        const resultText = document.getElementById('demo-result-text');
-        const levelDisplay = document.getElementById('demo-level-display');
-        
-        resultBox.classList.remove('hidden');
-        
-        if (outcome === 'independent') {
-            levelDisplay.textContent = 'Level 3 (14 days)';
-            levelDisplay.className = 'font-bold text-emerald-400';
-            resultText.innerHTML = '<strong>Level Promoted:</strong> Recorded as Independent. Interval upgraded to <strong>14 days</strong>.';
-        } else if (outcome === 'hint') {
-            levelDisplay.textContent = 'Level 2 (7 days)';
-            levelDisplay.className = 'font-bold text-amber-400';
-            resultText.innerHTML = '<strong>Interval Maintained:</strong> Needed Hint recorded. Kept at <strong>7 days</strong> for reinforcement.';
-        } else if (outcome === 'forgot') {
-            levelDisplay.textContent = 'Level 1 (3 days)';
-            levelDisplay.className = 'font-bold text-rose-400';
-            resultText.innerHTML = '<strong>Level Demoted:</strong> Forgot recorded. Interval reset to <strong>3 days</strong> to rebuild active recall.';
+    const demoProblems = [
+        {
+            number: 1,
+            title: "Two Sum",
+            difficulty: "Easy",
+            pattern: "Hashing",
+            url: "https://leetcode.com/problems/two-sum/",
+            revisions: 3,
+            cue: '"Need constant-time lookup while traversing."',
+            patternDetail: "Hashing &middot; Store seen elements in a Hash Map for O(1) complement lookup.",
+            mistakes: '"Initially considered nested loops. Watch out: cannot use the exact same element twice."',
+            notes: '"Store the complement while traversing. Single pass: check complement presence before inserting."'
+        },
+        {
+            number: 704,
+            title: "Binary Search",
+            difficulty: "Easy",
+            pattern: "Binary Search",
+            url: "https://leetcode.com/problems/binary-search/",
+            revisions: 2,
+            cue: '"Sorted array with monotonic search space for O(log N) search."',
+            patternDetail: "Binary Search &middot; Maintain search boundaries left and right, evaluate middle element.",
+            mistakes: '"Integer overflow with (left + right) / 2. Use left + (right - left) // 2."',
+            notes: '"Strict condition handling: left = mid + 1 vs right = mid - 1 to prevent infinite loops."'
+        },
+        {
+            number: 146,
+            title: "LRU Cache",
+            difficulty: "Medium",
+            pattern: "Design",
+            url: "https://leetcode.com/problems/lru-cache/",
+            revisions: 5,
+            cue: '"O(1) get and put operations with fast least-recently-used eviction."',
+            patternDetail: "Design &middot; Hash map for O(1) key lookup pointing to nodes in a Doubly Linked List.",
+            mistakes: '"Forgot to move accessed node to head on get() operation."',
+            notes: '"Use dummy head and tail sentinel nodes to simplify edge pointer updates."'
         }
+    ];
+
+    let currentDemoIndex = 0;
+    let selectedRating = null;
+
+    const ratingConfig = {
+        'forgot': {
+            label: 'Forgot (needed solution)',
+            textColor: 'text-purple-600 dark:text-purple-400',
+            activeClasses: 'selected-forgot border-2 border-purple-500 bg-purple-50 dark:bg-purple-500/15 ring-1 ring-purple-500/30 shadow-lg shadow-purple-500/15',
+            hoverBorder: 'hover:border-purple-500/50',
+            dotColor: 'bg-purple-500'
+        },
+        'hard': {
+            label: 'Hard (needed hints/notes)',
+            textColor: 'text-rose-600 dark:text-rose-400',
+            activeClasses: 'selected-hard border-2 border-rose-500 bg-rose-50 dark:bg-rose-500/15 ring-1 ring-rose-500/30 shadow-lg shadow-rose-500/15',
+            hoverBorder: 'hover:border-rose-500/50',
+            dotColor: 'bg-rose-500'
+        },
+        'medium': {
+            label: 'Medium (solved with effort)',
+            textColor: 'text-amber-600 dark:text-amber-400',
+            activeClasses: 'selected-medium border-2 border-amber-500 bg-amber-50 dark:bg-amber-500/15 ring-1 ring-amber-500/30 shadow-lg shadow-amber-500/15',
+            hoverBorder: 'hover:border-amber-500/50',
+            dotColor: 'bg-amber-500'
+        },
+        'easy': {
+            label: 'Easy (solved independently & fast)',
+            textColor: 'text-emerald-600 dark:text-emerald-400',
+            activeClasses: 'selected-easy border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-500/15 ring-1 ring-emerald-500/30 shadow-lg shadow-emerald-500/15',
+            hoverBorder: 'hover:border-emerald-500/50',
+            dotColor: 'bg-emerald-500'
+        }
+    };
+
+    const difficultyConfig = {
+        'Easy': 'px-2.5 py-0.5 rounded text-xs font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20',
+        'Medium': 'px-2.5 py-0.5 rounded text-xs font-mono font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20',
+        'Hard': 'px-2.5 py-0.5 rounded text-xs font-mono font-medium text-rose-400 bg-rose-500/10 border border-rose-500/20'
+    };
+
+    function updateRatingSelection(rating) {
+        selectedRating = rating;
+        const ratings = ['forgot', 'hard', 'medium', 'easy'];
+
+        ratings.forEach(r => {
+            const b = document.getElementById(`btn-rating-${r}`);
+            if (!b) return;
+            const cfg = ratingConfig[r];
+            if (!selectedRating) {
+                // Idle / unselected state
+                b.className = `demo-rating-btn w-full p-3.5 rounded-xl border border-white/10 ${cfg.hoverBorder} bg-slate-900/90 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer`;
+            } else if (r === selectedRating) {
+                // Active selected state
+                b.className = `demo-rating-btn w-full p-3.5 rounded-xl ${cfg.activeClasses} text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer`;
+            } else {
+                // Dimmed non-selected state
+                b.className = 'demo-rating-btn is-dimmed w-full p-3.5 rounded-xl border border-white/10 hover:border-white/20 bg-slate-900/50 opacity-40 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer';
+            }
+        });
+
+        const nextBtn = document.getElementById('demo-next-btn');
+        const dot = document.getElementById('demo-status-dot');
+        const feedback = document.getElementById('demo-action-feedback');
+
+        if (selectedRating) {
+            const cfg = ratingConfig[selectedRating];
+            if (nextBtn) nextBtn.disabled = false;
+            if (dot) dot.className = `w-2 h-2 rounded-full ${cfg.dotColor} animate-pulse`;
+            if (feedback) feedback.innerHTML = `Selected: <span class="${cfg.textColor} font-semibold">${cfg.label}</span>`;
+        } else {
+            if (nextBtn) nextBtn.disabled = true;
+            if (dot) dot.className = 'w-2 h-2 rounded-full bg-slate-500';
+            if (feedback) feedback.textContent = 'Select your recall outcome above to proceed';
+        }
+    }
+
+    function selectDemoRating(rating) {
+        // Option to deselect when clicking already selected rating
+        if (selectedRating === rating) {
+            updateRatingSelection(null);
+        } else {
+            updateRatingSelection(rating);
+        }
+    }
+
+    function renderDemoProblem(idx) {
+        const prob = demoProblems[idx];
+        document.getElementById('demo-title').textContent = prob.title;
+        document.getElementById('demo-number-badge').textContent = `Problem #${prob.number}`;
+
+        const diffBadge = document.getElementById('demo-difficulty-badge');
+        if (diffBadge) {
+            diffBadge.textContent = prob.difficulty;
+            diffBadge.className = difficultyConfig[prob.difficulty] || 'px-2.5 py-0.5 rounded text-xs font-mono font-medium text-white bg-white/10 border border-white/10';
+        }
+
+        document.getElementById('demo-pattern-badge').textContent = `Pattern: ${prob.pattern}`;
+        const probLink = document.getElementById('demo-problem-link') || document.getElementById('demo-leetcode-link');
+        if (probLink) probLink.href = prob.url;
+        document.getElementById('demo-rev-count').textContent = prob.revisions;
+
+        document.getElementById('cue-content').innerHTML = prob.cue;
+        document.getElementById('pattern-content').innerHTML = prob.patternDetail;
+        document.getElementById('mistake-content').innerHTML = prob.mistakes;
+        document.getElementById('notes-content').innerHTML = prob.notes;
+
+        // Reset cues to hidden
+        ['cue-content', 'pattern-content', 'mistake-content', 'notes-content'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+
+        // Reset reveal buttons with consistent w-36 shrink-0 size
+        document.querySelectorAll('section#demo button[onclick^="toggleReveal"]').forEach(btn => {
+            btn.className = 'btn-reveal h-8 w-36 shrink-0 text-xs font-medium rounded-lg bg-white/5 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 border border-white/10 hover:border-orange-500/30 transition-all flex items-center justify-center';
+            const onclickAttr = btn.getAttribute('onclick') || '';
+            if (onclickAttr.includes('pattern')) btn.textContent = 'Reveal Pattern';
+            else if (onclickAttr.includes('cue')) btn.textContent = 'Reveal Cue';
+            else if (onclickAttr.includes('notes')) btn.textContent = 'Reveal Notes';
+            else if (onclickAttr.includes('mistake')) btn.textContent = 'Reveal Mistakes';
+        });
+
+        // Update button text and icon (Submit vs Done)
+        const isLastCard = (idx === demoProblems.length - 1);
+        const submitBtnText = document.getElementById('demo-submit-btn-text');
+        const submitBtnIcon = document.getElementById('demo-submit-btn-icon');
+        if (submitBtnText) submitBtnText.textContent = isLastCard ? 'Done' : 'Submit';
+        if (submitBtnIcon) submitBtnIcon.setAttribute('data-lucide', isLastCard ? 'check' : 'arrow-right');
+
+        // Reset rating buttons to idle state (also disables submit button and sets idle feedback)
+        updateRatingSelection(null);
+
+        const nextBtn = document.getElementById('demo-next-btn');
+        if (nextBtn && window.lucide) {
+            lucide.createIcons({ root: nextBtn });
+        }
+    }
+
+    function submitDemoReview() {
+        if (!selectedRating) return;
+
+        // Increment revision count for this specific problem
+        demoProblems[currentDemoIndex].revisions += 1;
+        document.getElementById('demo-rev-count').textContent = demoProblems[currentDemoIndex].revisions;
+
+        const isLastCard = (currentDemoIndex === demoProblems.length - 1);
+        const cardBox = document.getElementById('demo-card-box');
+
+        if (isLastCard) {
+            // On last card, do NOT loop. Transition to completed view!
+            if (cardBox) {
+                cardBox.classList.add('opacity-0');
+            }
+
+            setTimeout(() => {
+                // Populate summary counts
+                const s0 = document.getElementById('summary-rev-0');
+                const s1 = document.getElementById('summary-rev-1');
+                const s2 = document.getElementById('summary-rev-2');
+                if (s0) s0.textContent = demoProblems[0].revisions;
+                if (s1) s1.textContent = demoProblems[1].revisions;
+                if (s2) s2.textContent = demoProblems[2].revisions;
+
+                const activeView = document.getElementById('demo-active-view');
+                const completedView = document.getElementById('demo-completed-view');
+                if (activeView) activeView.classList.add('hidden');
+                if (completedView) completedView.classList.remove('hidden');
+
+                if (cardBox) {
+                    cardBox.classList.remove('opacity-0');
+                    if (window.lucide) lucide.createIcons({ root: cardBox });
+                }
+            }, 180);
+            return;
+        }
+
+        // Transition to next problem
+        if (cardBox) {
+            cardBox.classList.add('opacity-0', '-translate-x-3');
+        }
+
+        setTimeout(() => {
+            currentDemoIndex += 1;
+            renderDemoProblem(currentDemoIndex);
+
+            if (cardBox) {
+                cardBox.classList.remove('-translate-x-3');
+                cardBox.classList.add('translate-x-3');
+                requestAnimationFrame(() => {
+                    cardBox.classList.remove('opacity-0', 'translate-x-3');
+                    if (window.lucide) lucide.createIcons({ root: cardBox });
+                });
+            }
+        }, 180);
     }
 
     function resetDemo() {
-        document.getElementById('demo-result').classList.add('hidden');
-        document.getElementById('pattern-content').classList.add('hidden');
-        document.getElementById('cue-content').classList.add('hidden');
-        document.getElementById('notes-content').classList.add('hidden');
-        document.getElementById('mistake-content').classList.add('hidden');
-        
-        const levelDisplay = document.getElementById('demo-level-display');
-        levelDisplay.textContent = 'Level 2 (7 days)';
-        levelDisplay.className = 'font-bold text-orange-400';
+        demoProblems[0].revisions = 3;
+        demoProblems[1].revisions = 2;
+        demoProblems[2].revisions = 5;
+        currentDemoIndex = 0;
+
+        const activeView = document.getElementById('demo-active-view');
+        const completedView = document.getElementById('demo-completed-view');
+        if (completedView) completedView.classList.add('hidden');
+        if (activeView) activeView.classList.remove('hidden');
+
+        renderDemoProblem(0);
     }
+
+    // Handle incoming URL parameters (e.g. ?tab=signup or ?tab=signin)
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const tabParam = params.get('tab') || '{{ active_tab|default:"signin" }}';
+        if (tabParam === 'signup' || tabParam === 'signin') {
+            switchAuthTab(tabParam);
+            if (params.get('tab')) {
+                const heroCard = document.getElementById('hero-auth-card');
+                if (heroCard) {
+                    heroCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+        {% if auth_errors %}
+        const activeForm = document.querySelector(tabParam === 'signup' ? 'form[data-auth-type="signup"]' : 'form[data-auth-type="signin"]');
+        if (activeForm) {
+            activeForm.dataset.hasSubmitted = 'true';
+        }
+        {% endif %}
+    });
 </script>
 {% endblock %}

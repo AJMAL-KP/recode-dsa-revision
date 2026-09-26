@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ReCode - Spaced Repetition LeetCode Revision Assistant{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}A spaced-repetition revision assistant for LeetCode and DSA preparation. Never forget algorithmic patterns and solved problems again.{% endblock %}">
+    <title>{% block title %}ReCode - Spaced Repetition DSA Revision Assistant{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}A spaced-repetition revision assistant for DSA problems. Never forget algorithmic patterns and solved problems again.{% endblock %}">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,6 +58,20 @@
     <!-- Custom Styles -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     
+    <!-- Theme Initializer (prevents flash) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            } else {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            }
+        })();
+    </script>
+
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-[#0b0f17] text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
@@ -68,28 +82,36 @@
             <div class="flex items-center justify-between h-14">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <a href="{% url 'landing' %}" class="flex flex-col">
+                    <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'landing' %}{% endif %}" class="flex flex-col">
                         <span class="font-bold text-lg tracking-tight text-white flex items-center">
                             Re<span class="text-orange-500">Code</span>
                         </span>
                     </a>
                 </div>
 
-                <!-- Auth / User Actions -->
-                <div class="flex items-center gap-3">
+                <!-- Auth / User Actions & Theme Toggle -->
+                <div class="flex items-center gap-2.5">
+                    <!-- Interactive Light / Dark Mode Toggle Button -->
+                    <button type="button" id="theme-toggle-btn" onclick="toggleTheme()" class="theme-toggle-btn relative h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center text-slate-300 hover:text-orange-400 bg-white/5 hover:bg-orange-500/10 border border-white/10 hover:border-orange-500/30 transition-all active:scale-90 cursor-pointer overflow-hidden shadow-sm" title="Toggle light/dark theme" aria-label="Toggle theme">
+                        <i data-lucide="sun" class="theme-icon-sun w-4 h-4 absolute text-orange-400"></i>
+                        <i data-lucide="moon" class="theme-icon-moon w-4 h-4 absolute text-slate-700 dark:text-slate-300"></i>
+                    </button>
+
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center gap-1.5">
-                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{% url 'logout' %}" class="p-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors" title="Sign out">
+                        {% if request.resolver_match.url_name != 'dashboard' %}
+                            <a href="{% url 'dashboard' %}" class="h-8 sm:h-9 px-3.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center gap-1.5 shadow-sm">
+                                <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}" class="btn-logout h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all" title="Sign out">
                             <i data-lucide="log-out" class="w-4 h-4"></i>
                         </a>
                     {% else %}
-                        <a href="{% url 'login' %}" class="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 transition-colors">
+                        <a href="{% url 'landing' %}?tab=signin" onclick="if (typeof scrollToAuth === 'function') { scrollToAuth('signin'); return false; }" class="btn-nav-signin text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 transition-all">
                             Sign In
                         </a>
-                        <a href="{% url 'register' %}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-colors">
+                        <a href="{% url 'landing' %}?tab=signup" onclick="if (typeof scrollToAuth === 'function') { scrollToAuth('signup'); return false; }" class="h-8 sm:h-9 px-3.5 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center shadow-sm">
                             Get Started
                         </a>
                     {% endif %}
@@ -98,24 +120,22 @@
         </div>
     </nav>
 
-    <!-- Global Messages -->
-    {% if messages %}
-    <div class="max-w-4xl mx-auto px-4 mt-3 w-full z-40">
-        {% for message in messages %}
-        <div class="p-3 rounded-lg mb-2 flex items-center gap-2.5 text-xs font-medium border shadow-sm
-            {% if message.tags == 'error' %}
-                bg-rose-950/60 border-rose-500/30 text-rose-200
-            {% elif message.tags == 'success' %}
-                bg-emerald-950/60 border-emerald-500/30 text-emerald-200
-            {% else %}
-                bg-slate-900 border-orange-500/30 text-orange-200
-            {% endif %}">
-            <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
-            <span class="flex-1">{{ message }}</span>
-        </div>
-        {% endfor %}
+    <!-- Global Floating Toast Notification Container -->
+    <div id="toast-container" class="fixed top-16 right-4 sm:right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="toast-item pointer-events-auto bg-[#101623]/95 backdrop-blur-md border border-orange-500/40 text-white shadow-2xl p-3.5 rounded-xl flex items-start justify-between gap-3 text-xs transition-all duration-300 transform translate-y-0 opacity-100">
+                <div class="flex items-start gap-2.5">
+                    <span class="w-2 h-2 rounded-full bg-orange-500 mt-1 shrink-0"></span>
+                    <span class="leading-relaxed font-medium">{{ message }}</span>
+                </div>
+                <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="text-slate-400 hover:text-white transition-colors p-0.5" title="Dismiss">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
     </div>
-    {% endif %}
 
     <!-- Main Content -->
     <main class="flex-1 w-full">
@@ -132,30 +152,30 @@
                         <span class="font-bold text-base text-white">Re<span class="text-orange-500">Code</span></span>
                     </div>
                     <p class="text-slate-400 text-xs max-w-sm leading-relaxed">
-                        A spaced-repetition revision assistant for LeetCode and DSA preparation. Helping you retain previously solved problems and recognize core algorithmic patterns.
+                        A spaced-repetition revision assistant for DSA problems. Helping you retain previously solved problems and recognize core algorithmic patterns.
                     </p>
                 </div>
                 <div>
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Core Pillars</h4>
                     <div class="space-y-1.5 text-xs text-slate-400">
                         <div>Active Recall</div>
-                        <div>Adaptive Spaced Repetition</div>
-                        <div>Strict Daily Quota Protection</div>
+                        <div>Adaptive Spaced Repetition (FSRS)</div>
+                        <div>Pattern Recall Analytics</div>
                     </div>
                 </div>
                 <div>
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Workflow</h4>
                     <div class="space-y-1.5 text-xs text-slate-400">
                         <div>Add Solved Problems</div>
-                        <div>Progressive Cues & Notes</div>
-                        <div>Performance-Based Intervals</div>
+                        <div>Progressive Reveal</div>
+                        <div>FSRS Memory Scheduling</div>
                     </div>
                 </div>
             </div>
             <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
                 <p>&copy; 2026 ReCode. Built for DSA retention.</p>
                 <div class="flex items-center gap-2 text-slate-400 text-[11px]">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                     <span>Spaced Repetition Active</span>
                 </div>
             </div>
@@ -163,8 +183,74 @@
     </footer>
     {% endblock %}
 
+    <script src="{% static 'js/auth-validation.js' %}"></script>
     <script>
         lucide.createIcons();
+
+        function dismissToast(el) {
+            if (!el) return;
+            el.classList.add('opacity-0', '-translate-y-2');
+            setTimeout(() => {
+                if (el.parentNode) el.parentNode.removeChild(el);
+            }, 300);
+        }
+
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-item pointer-events-auto bg-[#101623]/95 backdrop-blur-md border border-orange-500/40 text-white shadow-2xl p-3.5 rounded-xl flex items-start justify-between gap-3 text-xs transition-all duration-300 transform -translate-y-2 opacity-0';
+            toast.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                    <span class="w-2 h-2 rounded-full bg-orange-500 mt-1 shrink-0"></span>
+                    <span class="leading-relaxed font-medium">${message}</span>
+                </div>
+                <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="text-slate-400 hover:text-white transition-colors p-0.5" title="Dismiss">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons({ root: toast });
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('-translate-y-2', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            setTimeout(() => {
+                dismissToast(toast);
+            }, duration);
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Force reload when navigating via back/forward cache (bfcache) to guarantee auth state is fresh
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        // Auto-dismiss any existing messages on page load after 4 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.toast-item').forEach((toast, idx) => {
+                setTimeout(() => {
+                    dismissToast(toast);
+                }, 4000 + (idx * 500));
+            });
+        });
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>

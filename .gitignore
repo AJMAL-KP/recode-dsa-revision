@@ -14,8 +14,17 @@ db.sqlite3-journal
 media/
 staticfiles/
 
-# Environments
+# Database dumps / backups (to prevent committing data dumps)
+*.sql
+*.dump
+*.backup
+*.rdb
+
+# Environments & secrets
 .env
+.env.*
+!.env.example
+*.env
 .venv/
 env/
 venv/
