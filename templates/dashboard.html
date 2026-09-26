@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - ReCode{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Top Section (Unboxed Header Area) -->
+    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-2">
+        
+        <!-- Left: Welcome & Description & Actions -->
+        <div class="space-y-4 max-w-xl">
+            <div>
+                <div class="text-xs font-mono uppercase tracking-wider text-slate-400">ReCode &middot; Spaced Repetition Assistant</div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
+                    Welcome, <span class="text-orange-400">{{ user.email|default:"Developer" }}</span>
+                </h1>
+                <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">
+                    Review your previously solved DSA problems through adaptive active recall and spaced repetition to retain patterns long-term.
+                </p>
+            </div>
+
+            <!-- Primary Actions -->
+            <div class="flex items-center gap-3 pt-1">
+                <button onclick="openAddProblemModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-200 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-2">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 text-orange-400"></i>
+                    <span>Add Solved Problem</span>
+                </button>
+                <a href="#problems-container" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center gap-2 shadow-sm">
+                    <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                    <span>Start Revision</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Right: Metrics Top Row & Active Streak Just Below It -->
+        <div class="space-y-4 lg:text-right flex flex-col lg:items-end">
+            
+            <!-- Top Row: Total Revisions & Recall Success -->
+            <div class="flex items-center gap-8">
+                <div>
+                    <div class="text-xs font-medium text-slate-400">Total Revisions</div>
+                    <div class="text-2xl font-bold font-mono text-white mt-0.5">
+                        {{ stats.total_revs_done }}<span class="text-slate-500 text-base font-normal"> / {{ stats.total_revs_target }}</span>
+                    </div>
+                </div>
+
+                <div class="border-l border-white/10 pl-8">
+                    <div class="text-xs font-medium text-slate-400">Recall Success</div>
+                    <div class="text-2xl font-bold font-mono text-emerald-400 mt-0.5">{{ stats.recall_success_pct }}%</div>
+                    <div class="text-[11px] text-slate-400 font-mono">Memory Retained</div>
+                </div>
+            </div>
+
+            <!-- Below Row: Active Streak with clean UI -->
+            <div class="pt-2 border-t border-white/10 w-full flex flex-col lg:items-end gap-1.5">
+                <div class="flex items-center justify-between lg:justify-end gap-4 text-xs">
+                    <span class="text-slate-300 font-medium">
+                        Active Streak: <strong class="text-orange-400 font-mono text-sm">{{ stats.active_streak }} Days</strong>
+                    </span>
+                    <span class="text-slate-500 font-mono text-[11px]">Max: {{ stats.max_streak }} Days</span>
+                </div>
+                
+                <!-- Streak Progress Pips -->
+                <div class="flex items-center gap-1.5">
+                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 1"></span>
+                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 2"></span>
+                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 3"></span>
+                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 4"></span>
+                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 5 (Today)"></span>
+                    <span class="h-2 w-7 rounded-full bg-slate-800" title="Upcoming"></span>
+                    <span class="h-2 w-7 rounded-full bg-slate-800" title="Upcoming"></span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Revision Section: Heading & Quota Outside the Box -->
+    <div class="space-y-3 pt-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-lg font-bold text-white flex items-center gap-2.5">
+                    <span>Start Revision</span>
+                    <span class="text-xs font-mono px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">
+                        {{ stats.completed_today }}/{{ stats.total_today }} Completed Today
+                    </span>
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">Problems queued for today's active recall</p>
+            </div>
+
+            <!-- Set Daily Quota Outside Box -->
+            <div class="flex items-center gap-2 text-xs">
+                <span class="text-slate-400 font-medium">Set Daily Quota:</span>
+                <div class="flex items-center gap-1 bg-[#101623] p-1 rounded-lg border border-white/10 font-mono">
+                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">5</button>
+                    <button class="px-2.5 py-1 rounded bg-orange-600 text-white font-bold">10</button>
+                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">15</button>
+                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">20</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONLY Problems in the Box -->
+        <div id="problems-container" class="bg-[#101623] rounded-2xl border border-white/10 p-5 sm:p-6 shadow-xl">
+            <div class="divide-y divide-white/5">
+                {% for problem in revision_queue %}
+                <div class="py-3.5 flex items-center justify-between gap-4 {% if problem.is_completed %}opacity-40{% endif %} transition-opacity">
+                    <!-- Left: Problem number and Title -->
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="text-xs font-mono text-slate-500 w-6 text-right shrink-0">{{ forloop.counter }}.</span>
+                        
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span class="text-sm font-medium {% if problem.is_completed %}line-through text-slate-400{% else %}text-white{% endif %} truncate">
+                                <span class="font-mono text-xs text-slate-400 mr-1.5">#{{ problem.number }}</span>{{ problem.title }}
+                            </span>
+
+                            {% if problem.is_completed %}
+                            <span class="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
+                                <i data-lucide="check" class="w-3 h-3"></i> Done
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Right: Level & Difficulty -->
+                    <div class="flex items-center gap-6 shrink-0 font-mono text-xs">
+                        <span class="text-slate-400">Level {{ problem.level }}</span>
+                        
+                        {% if problem.difficulty == 'Easy' %}
+                            <span class="text-emerald-400 w-14 text-right font-medium">Easy</span>
+                        {% elif problem.difficulty == 'Medium' %}
+                            <span class="text-amber-400 w-14 text-right font-medium">Medium</span>
+                        {% else %}
+                            <span class="text-rose-400 w-14 text-right font-medium">Hard</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Single Revision CTA at End of Problems Box -->
+            <div class="pt-5 mt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-slate-400">
+                    <span class="text-white font-semibold">{{ stats.pending_today }} problems pending</span> in today's quota.
+                </div>
+
+                <button onclick="handleStartRevision()" class="w-full sm:w-auto px-6 py-2.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20">
+                    <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                    <span>Start Revision Session</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Stats Cards: Recall Performance & Pattern Recall -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+        
+        <!-- Left: Recall Performance -->
+        <div class="bg-[#101623] rounded-2xl border border-white/10 p-6 shadow-xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-white/5">
+                <div>
+                    <h3 class="text-sm font-bold text-white">Recall Performance</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Active recall outcome distribution</p>
+                </div>
+                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">83 Total Reviews</span>
+            </div>
+
+            <!-- Segmented Distribution Bar -->
+            <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden flex">
+                <div class="bg-emerald-500 h-full" style="width: {{ recall_stats.independent_pct }}%" title="Independent ({{ recall_stats.independent_pct }}%)"></div>
+                <div class="bg-amber-400 h-full" style="width: {{ recall_stats.hint_pct }}%" title="Needed Hint ({{ recall_stats.hint_pct }}%)"></div>
+                <div class="bg-rose-500 h-full" style="width: {{ recall_stats.forgot_pct }}%" title="Forgot ({{ recall_stats.forgot_pct }}%)"></div>
+            </div>
+
+            <!-- Stats Rows -->
+            <div class="space-y-2.5 text-xs font-mono">
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                    <span class="flex items-center gap-2 text-slate-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>Independent</span>
+                    </span>
+                    <span class="font-bold text-emerald-400">{{ recall_stats.independent_count }} ({{ recall_stats.independent_pct }}%)</span>
+                </div>
+
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                    <span class="flex items-center gap-2 text-slate-300">
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                        <span>Needed Hint</span>
+                    </span>
+                    <span class="font-bold text-amber-400">{{ recall_stats.hint_count }} ({{ recall_stats.hint_pct }}%)</span>
+                </div>
+
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                    <span class="flex items-center gap-2 text-slate-300">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <span>Forgot (Reset to Level 1)</span>
+                    </span>
+                    <span class="font-bold text-rose-400">{{ recall_stats.forgot_count }} ({{ recall_stats.forgot_pct }}%)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Pattern Recall -->
+        <div class="bg-[#101623] rounded-2xl border border-white/10 p-6 shadow-xl space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-white/5">
+                <div>
+                    <h3 class="text-sm font-bold text-white">Pattern Recall</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Retention rate categorized by algorithmic pattern</p>
+                </div>
+                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">5 Categories</span>
+            </div>
+
+            <div class="space-y-3.5">
+                {% for pat in pattern_stats %}
+                <div class="space-y-1.5 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-300 font-medium">{{ pat.name }}</span>
+                        <span class="font-mono text-slate-400 font-semibold">{{ pat.pct }}%</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                        <div class="bg-orange-500 h-full rounded-full" style="width: {{ pat.pct }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Modal: Add Solved Problem -->
+<div id="addProblemModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-white/10">
+            <h3 class="text-base font-bold text-white">Add Solved Problem</h3>
+            <button onclick="closeAddProblemModal()" class="p-1 rounded text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Form preview -->
+        <form onsubmit="handleDummySubmit(event)" class="space-y-4 mt-4">
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Problem #</label>
+                    <input type="number" placeholder="1" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs font-mono focus:border-orange-500 focus:outline-none" required>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Problem Title</label>
+                    <input type="text" placeholder="Two Sum" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Difficulty</label>
+                    <select class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white text-xs focus:border-orange-500 focus:outline-none">
+                        <option value="Easy">Easy</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Pattern</label>
+                    <input type="text" placeholder="e.g. Hashing" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Recognition Cue (Prompt)</label>
+                <input type="text" placeholder="e.g. Need constant-time lookup for complement" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Common Mistakes</label>
+                    <textarea rows="2" placeholder="e.g. Nested loop O(N^2)" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Notes</label>
+                    <textarea rows="2" placeholder="e.g. Store complement in dict" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
+                <button type="button" onclick="closeAddProblemModal()" class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white bg-white/5 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 transition-colors">
+                    Save Problem
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<!-- Footer intentionally omitted for full screen dashboard view -->
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function openAddProblemModal() {
+        document.getElementById('addProblemModal').classList.remove('hidden');
+    }
+
+    function closeAddProblemModal() {
+        document.getElementById('addProblemModal').classList.add('hidden');
+    }
+
+    function handleStartRevision() {
+        alert('Starting active recall revision session for pending problems.');
+    }
+
+    function handleDummySubmit(e) {
+        e.preventDefault();
+        alert('Problem added successfully.');
+        closeAddProblemModal();
+    }
+</script>
+{% endblock %}

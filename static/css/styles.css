@@ -1,0 +1,103 @@
+/* Custom professional styles for ReCode - Clean Engineering Theme */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: #0b0f17;
+    color: #e2e8f0;
+    overflow-x: hidden;
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+/* Professional Solid & Subtle Glass Surfaces */
+.glass-panel {
+    background: #111726;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-glow {
+    background: #111726;
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card {
+    background: #101623;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: all 0.2s ease;
+}
+
+.glass-card:hover {
+    border-color: rgba(249, 115, 22, 0.35);
+    background: #141c2c;
+}
+
+/* Orange Gradient Accents */
+.gradient-text {
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-border {
+    position: relative;
+    border-radius: 0.75rem;
+    background: #111726;
+}
+
+/* Clean Button Styles */
+.btn-primary {
+    background: #ea580c;
+    color: #ffffff;
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+    background: #f97316;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+}
+
+.btn-secondary {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+    background: #283548;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0f17;
+}
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
