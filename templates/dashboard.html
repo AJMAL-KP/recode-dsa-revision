@@ -25,11 +25,11 @@
             <div class="flex items-center gap-3 pt-1">
                 <button onclick="openAddProblemModal()" class="btn-secondary h-9 px-4 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-2">
                     <i data-lucide="plus" class="w-3.5 h-3.5 text-orange-400"></i>
-                    <span>Add Solved Problem</span>
+                    <span>Add Problem</span>
                 </button>
                 <a href="#problems-container" class="h-9 px-5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center gap-2 shadow-lg shadow-orange-600/20">
                     <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
-                    <span>Start Revision</span>
+                    <span>Start Revising</span>
                 </a>
             </div>
         </div>
@@ -37,19 +37,19 @@
         <!-- Right: Metrics Top Row & Active Streak Just Below It -->
         <div class="space-y-4 lg:text-right flex flex-col lg:items-end">
             
-            <!-- Top Row: Total Revisions & Recall Success -->
+            <!-- Top Row: Total Reviews & Recall Success -->
             <div class="flex items-center gap-8">
                 <div>
-                    <div class="text-xs font-medium text-slate-400">Total Revisions</div>
+                    <div class="text-xs font-medium text-slate-400">Total Reviews</div>
                     <div class="text-2xl font-bold font-mono text-white mt-0.5">
-                        {{ stats.total_revs_done }}<span class="text-slate-500 text-base font-normal"> / {{ stats.total_revs_target }}</span>
+                        {{ stats.total_revs_done }}<span class="text-slate-500 text-base font-normal"> ({{ stats.total_problems }} Solved)</span>
                     </div>
                 </div>
 
                 <div class="border-l border-white/10 pl-8">
                     <div class="text-xs font-medium text-slate-400">Recall Success</div>
                     <div class="text-2xl font-bold font-mono text-emerald-400 mt-0.5">{{ stats.recall_success_pct }}%</div>
-                    <div class="text-[11px] text-slate-400 font-mono">Memory Retained</div>
+                    <div class="text-[11px] text-slate-400 font-mono">Good &amp; Easy</div>
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
                     <span class="text-slate-300 font-medium">
                         Active Streak: <strong class="text-orange-400 font-mono text-sm">{{ stats.active_streak }} Days</strong>
                     </span>
-                    <span class="text-slate-500 font-mono text-[11px]">Max: {{ stats.max_streak }} Days</span>
+                    <span class="text-slate-500 font-mono text-[11px]">Longest: {{ stats.max_streak }} Days</span>
                 </div>
                 
                 <!-- Streak Progress Pips -->
@@ -78,27 +78,27 @@
 
     </div>
 
-    <!-- Revision Section: Heading & Quota Outside the Box -->
+    <!-- Revision Section: Heading & Batch Preview Outside the Box -->
     <div class="space-y-3 pt-2">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h2 class="text-lg font-bold text-white flex items-center gap-2.5">
-                    <span>Start Revision</span>
+                    <span>Today's Revision</span>
                     <span class="text-xs font-mono px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">
-                        {{ stats.completed_today }}/{{ stats.total_today }} Completed Today
+                        Visual Preview &middot; Due Today
                     </span>
                 </h2>
-                <p class="text-xs text-slate-400 mt-0.5">Problems queued for today's active recall</p>
+                <p class="text-xs text-slate-400 mt-0.5">Visual preview of solved problems scheduled for active recall</p>
             </div>
 
-            <!-- Set Daily Quota Outside Box -->
+            <!-- Preview Batch Selector Outside Box -->
             <div class="flex items-center gap-2 text-xs">
-                <span class="text-slate-400 font-medium">Set Daily Quota:</span>
+                <span class="text-slate-400 font-medium">Session Batch:</span>
                 <div class="flex items-center gap-1 bg-[#101623] p-1 rounded-lg border border-white/10 font-mono">
                     <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">5</button>
                     <button class="px-2.5 py-1 rounded bg-orange-600 text-white font-bold">10</button>
                     <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">15</button>
-                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">20</button>
+                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">All</button>
                 </div>
             </div>
         </div>
@@ -119,15 +119,15 @@
 
                             {% if problem.is_completed %}
                             <span class="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
-                                <i data-lucide="check" class="w-3 h-3"></i> Done
+                                <i data-lucide="check" class="w-3 h-3"></i> Reviewed
                             </span>
                             {% endif %}
                         </div>
                     </div>
 
-                    <!-- Right: Level & Difficulty -->
+                    <!-- Right: Pattern & Difficulty -->
                     <div class="flex items-center gap-6 shrink-0 font-mono text-xs">
-                        <span class="text-slate-400">Level {{ problem.level }}</span>
+                        <span class="text-slate-400">{{ problem.pattern }}</span>
                         
                         {% if problem.difficulty == 'Easy' %}
                             <span class="text-emerald-400 w-14 text-right font-medium">Easy</span>
@@ -144,12 +144,12 @@
             <!-- Single Revision CTA at End of Problems Box -->
             <div class="pt-5 mt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="text-xs text-slate-400">
-                    <span class="text-white font-semibold">{{ stats.pending_today }} problems pending</span> in today's quota.
+                    <span class="text-white font-semibold">Adaptive revision session</span> &middot; Review as many or as few as you want.
                 </div>
 
                 <button onclick="handleStartRevision()" class="w-full sm:w-auto h-9 px-6 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20">
                     <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
-                    <span>Start Revision Session</span>
+                    <span>Start Revising</span>
                 </button>
             </div>
         </div>
@@ -165,40 +165,49 @@
                     <h3 class="text-sm font-bold text-white">Recall Performance</h3>
                     <p class="text-xs text-slate-400 mt-0.5">Active recall outcome distribution</p>
                 </div>
-                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">83 Total Reviews</span>
+                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">{{ stats.total_reviews }} Total Reviews</span>
             </div>
 
             <!-- Segmented Distribution Bar -->
             <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden flex">
-                <div class="bg-emerald-500 h-full" style="width: {{ recall_stats.independent_pct }}%" title="Independent ({{ recall_stats.independent_pct }}%)"></div>
-                <div class="bg-amber-400 h-full" style="width: {{ recall_stats.hint_pct }}%" title="Needed Hint ({{ recall_stats.hint_pct }}%)"></div>
-                <div class="bg-rose-500 h-full" style="width: {{ recall_stats.forgot_pct }}%" title="Forgot ({{ recall_stats.forgot_pct }}%)"></div>
+                <div class="bg-[#00C853] h-full" style="width: {{ recall_stats.easy_pct }}%" title="Easy ({{ recall_stats.easy_pct }}%)"></div>
+                <div class="bg-[#AEEA00] h-full" style="width: {{ recall_stats.good_pct }}%" title="Medium ({{ recall_stats.good_pct }}%)"></div>
+                <div class="bg-[#FFD600] h-full" style="width: {{ recall_stats.hard_pct }}%" title="Hard ({{ recall_stats.hard_pct }}%)"></div>
+                <div class="bg-[#FF1744] h-full" style="width: {{ recall_stats.again_pct }}%" title="Again ({{ recall_stats.again_pct }}%)"></div>
             </div>
 
-            <!-- Stats Rows -->
+            <!-- Stats Rows (FSRS Ratings) -->
             <div class="space-y-2.5 text-xs font-mono">
                 <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
                     <span class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span>Independent</span>
+                        <span class="w-2 h-2 rounded-full bg-[#00C853]"></span>
+                        <span>Easy &middot; Solved Independently</span>
                     </span>
-                    <span class="font-bold text-emerald-400">{{ recall_stats.independent_count }} ({{ recall_stats.independent_pct }}%)</span>
+                    <span class="font-bold text-[#009624] dark:text-[#00C853]">{{ recall_stats.easy_count }} ({{ recall_stats.easy_pct }}%)</span>
                 </div>
 
                 <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
                     <span class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                        <span>Needed Hint</span>
+                        <span class="w-2 h-2 rounded-full bg-[#AEEA00]"></span>
+                        <span>Medium &middot; Recognized Pattern</span>
                     </span>
-                    <span class="font-bold text-amber-400">{{ recall_stats.hint_count }} ({{ recall_stats.hint_pct }}%)</span>
+                    <span class="font-bold text-[#558B2F] dark:text-[#AEEA00]">{{ recall_stats.good_count }} ({{ recall_stats.good_pct }}%)</span>
                 </div>
 
                 <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
                     <span class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                        <span>Forgot (Reset to Level 1)</span>
+                        <span class="w-2 h-2 rounded-full bg-[#FFD600]"></span>
+                        <span>Hard &middot; Needed Hints/Notes</span>
                     </span>
-                    <span class="font-bold text-rose-400">{{ recall_stats.forgot_count }} ({{ recall_stats.forgot_pct }}%)</span>
+                    <span class="font-bold text-[#B45309] dark:text-[#FFD600]">{{ recall_stats.hard_count }} ({{ recall_stats.hard_pct }}%)</span>
+                </div>
+
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
+                    <span class="flex items-center gap-2 text-slate-300">
+                        <span class="w-2 h-2 rounded-full bg-[#FF1744]"></span>
+                        <span>Again &middot; Needed Full Solution</span>
+                    </span>
+                    <span class="font-bold text-[#D50000] dark:text-[#FF1744]">{{ recall_stats.again_count }} ({{ recall_stats.again_pct }}%)</span>
                 </div>
             </div>
         </div>
@@ -208,9 +217,9 @@
             <div class="flex items-center justify-between pb-3 border-b border-white/5">
                 <div>
                     <h3 class="text-sm font-bold text-white">Pattern Recall</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Retention rate categorized by algorithmic pattern</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Good &amp; Easy recall rate by algorithmic pattern</p>
                 </div>
-                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">5 Categories</span>
+                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">6 Patterns</span>
             </div>
 
             <div class="space-y-3.5">
@@ -232,68 +241,325 @@
 
 </div>
 
-<!-- Modal: Add Solved Problem -->
-<div id="addProblemModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-lg bg-[#101623] p-6 rounded-2xl border border-white/10 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+<!-- Modal: Add Problem -->
+<div id="addProblemModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5">
+    <div class="w-full max-w-4xl p-4 sm:p-5 rounded-2xl shadow-2xl relative max-h-[94vh] overflow-y-auto border border-white/10" style="background-color: var(--color-modal-bg); border-color: var(--color-modal-border); color: var(--color-text-main);">
+        
         <!-- Modal Header -->
-        <div class="flex items-center justify-between pb-4 border-b border-white/10">
-            <h3 class="text-base font-bold text-white">Add Solved Problem</h3>
-            <button onclick="closeAddProblemModal()" class="btn-close p-1 rounded text-slate-400 hover:text-white transition-colors" title="Close modal">
+        <div class="flex items-center justify-between pb-2.5 border-b" style="border-color: var(--color-border-base);">
+            <div class="flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4 text-orange-400"></i>
+                <h3 class="text-sm font-bold tracking-tight" style="color: var(--color-text-title);">Add Problem</h3>
+            </div>
+            <button type="button" onclick="closeAddProblemModal()" class="btn-close p-1 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer" style="color: var(--color-text-muted);" title="Close modal">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
         </div>
 
-        <!-- Form preview -->
-        <form onsubmit="handleDummySubmit(event)" class="space-y-4 mt-4">
-            <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Problem #</label>
-                    <input type="number" placeholder="1" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs font-mono focus:border-orange-500 focus:outline-none" required>
+        <!-- Add Problem Form (HTML novalidate for theme-appropriate UI validation) -->
+        <form id="addProblemForm" onsubmit="handleRealProblemSubmit(event)" novalidate class="mt-2.5 space-y-3">
+            {% csrf_token %}
+            <input type="hidden" id="modal-platform" name="platform" value="leetcode">
+            <input type="hidden" id="modal-canonical-url" name="canonical_url" value="">
+            <input type="hidden" id="modal-problem-number" name="problem_number" value="">
+            <input type="hidden" id="modal-initial-rating" name="initial_rating" value="">
+            <input type="hidden" id="modal-is-user-specific" name="is_user_specific" value="false">
+
+            <!-- Step 1: Problem Link (Always Active / Gatekeeper - Blended & Compact) -->
+            <div class="space-y-1.5 p-2.5 rounded-xl border" style="background-color: var(--color-bg-elevated); border-color: var(--color-border-base);">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-semibold" style="color: var(--color-text-main);">
+                        Problem Link <span class="text-rose-400">*</span>
+                    </label>
+                    <span class="text-[11px] font-mono text-slate-400">LeetCode, Codeforces, HackerRank, etc.</span>
                 </div>
-                <div class="col-span-2">
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Problem Title</label>
-                    <input type="text" placeholder="Two Sum" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
+                
+                <div class="relative flex items-center">
+                    <input 
+                        type="url" 
+                        id="modal-problem-url" 
+                        name="url" 
+                        placeholder="https://leetcode.com/problems/..." 
+                        onpaste="handleUrlPaste(event)"
+                        oninput="handleUrlInputDebounced()"
+                        class="w-full pl-3 pr-20 py-2 rounded-xl text-xs font-mono focus:border-orange-500 focus:outline-none transition-all"
+                        required
+                    >
+                    <button 
+                        type="button" 
+                        id="btn-inspect-url" 
+                        onclick="triggerUrlInspection(true)" 
+                        class="absolute right-1.5 w-16 h-7 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-all flex items-center justify-center cursor-pointer shadow-sm disabled:opacity-75 disabled:cursor-not-allowed shrink-0"
+                        title="Fetch problem details"
+                    >
+                        <span id="btn-inspect-text" class="flex items-center justify-center pointer-events-none">Fetch</span>
+                    </button>
+                </div>
+
+                <!-- Subtle Status Note & Prompt Hint -->
+                <div id="url-prompt-hint" class="text-[11px] font-mono text-slate-500 mt-0.5 flex items-center gap-1.5">
+                    <i data-lucide="link" class="w-3 h-3 text-orange-400"></i>
+                    <span>Enter or paste a problem link above to unlock problem details.</span>
+                </div>
+                <div id="url-feedback-box" class="hidden text-[11px] font-mono transition-all pt-0.5"></div>
+
+                <!-- Already Added Notice Pill (Inline, compact, does not shift layout) -->
+                <div id="already-added-pill" class="hidden text-xs rounded-xl p-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 mt-1.5 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bookmark-check" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                        <span class="font-medium text-[11px]">Problem already in revision schedule &middot; Update details</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Difficulty</label>
-                    <select class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white text-xs focus:border-orange-500 focus:outline-none">
-                        <option value="Easy">Easy</option>
-                        <option value="Medium" selected>Medium</option>
-                        <option value="Hard">Hard</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Pattern</label>
-                    <input type="text" placeholder="e.g. Hashing" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none" required>
-                </div>
-            </div>
+            <!-- Gated Form Body: Disabled & Dimmed until valid problem URL is entered -->
+            <div id="modal-form-body" class="opacity-30 pointer-events-none transition-all duration-300 select-none space-y-3.5">
+                
+                <!-- Split Two-Column Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Left Column: Title & Diff, Patterns (with inline chips), Recognition Cue -->
+                    <div class="space-y-4 md:border-r md:pr-6" style="border-color: var(--color-border-base);">
+                        
+                        <!-- Title & Difficulty Row -->
+                        <div>
+                            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                                <!-- Title (3 cols) -->
+                                <div class="sm:col-span-3 space-y-1.5">
+                                    <label class="block text-xs font-medium flex items-center justify-between" style="color: var(--color-text-body);">
+                                        <span>Title <span class="text-rose-400">*</span></span>
+                                        <span id="title-lock-badge" class="hidden text-slate-400">
+                                            <i data-lucide="lock" class="w-3 h-3 text-slate-400"></i>
+                                        </span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="modal-problem-title" 
+                                        name="title" 
+                                        placeholder="Problem title" 
+                                        oninput="clearFieldError('title-error')"
+                                        class="w-full px-3 py-2 rounded-xl text-xs focus:border-orange-500 focus:outline-none transition-all" 
+                                        required
+                                    >
+                                </div>
 
-            <div>
-                <label class="block text-xs font-medium text-slate-300 mb-1">Recognition Cue (Prompt)</label>
-                <input type="text" placeholder="e.g. Need constant-time lookup for complement" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none">
-            </div>
+                                <!-- Difficulty Segmented Toggle (2 cols) -->
+                                <div class="sm:col-span-2 space-y-1.5">
+                                    <label class="block text-xs font-medium flex items-center justify-between" style="color: var(--color-text-body);">
+                                        <span>Difficulty <span class="text-rose-400">*</span></span>
+                                        <span id="diff-lock-badge" class="hidden text-slate-400">
+                                            <i data-lucide="lock" class="w-3 h-3 text-slate-400"></i>
+                                        </span>
+                                    </label>
+                                    <input type="hidden" id="modal-problem-difficulty" name="difficulty" value="">
+                                    
+                                    <!-- Custom Segmented Difficulty Selector -->
+                                    <div id="diff-selector" class="grid grid-cols-3 gap-1 p-0.5 rounded-xl border font-mono text-xs" style="background-color: var(--color-bg-input); border-color: var(--color-border-base);">
+                                        <button type="button" id="diff-btn-easy" onclick="selectDifficulty('Easy')" class="diff-btn py-1.5 text-center rounded-lg text-[11px] font-medium text-slate-400 hover:text-emerald-400 transition-all cursor-pointer">Easy</button>
+                                        <button type="button" id="diff-btn-medium" onclick="selectDifficulty('Medium')" class="diff-btn py-1.5 text-center rounded-lg text-[11px] font-medium text-slate-400 hover:text-amber-400 transition-all cursor-pointer">Med</button>
+                                        <button type="button" id="diff-btn-hard" onclick="selectDifficulty('Hard')" class="diff-btn py-1.5 text-center rounded-lg text-[11px] font-medium text-slate-400 hover:text-rose-400 transition-all cursor-pointer">Hard</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="title-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Please enter problem title.</div>
+                            <div id="diff-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Please select problem difficulty.</div>
+                        </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Common Mistakes</label>
-                    <textarea rows="2" placeholder="e.g. Nested loop O(N^2)" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Notes</label>
-                    <textarea rows="2" placeholder="e.g. Store complement in dict" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-white placeholder-slate-500 text-xs focus:border-orange-500 focus:outline-none"></textarea>
-                </div>
-            </div>
+                        <!-- Multi-select Patterns Section (Chips placed directly inside input) -->
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold" style="color: var(--color-text-main);">
+                                Patterns <span class="text-rose-400">*</span>
+                            </label>
+                            
+                            <!-- Pattern Input Container with Dynamic Chips Inside -->
+                            <div class="relative">
+                                <div 
+                                    id="pattern-input-container" 
+                                    onclick="document.getElementById('pattern-search-input').focus()"
+                                    class="w-full min-h-[38px] px-2.5 py-1.5 rounded-xl border flex flex-wrap items-center gap-1.5 cursor-text transition-all focus-within:border-orange-500" 
+                                    style="background-color: var(--color-bg-input); border-color: var(--color-border-base);"
+                                >
+                                    <!-- Dynamic chips rendered here -->
+                                    <div id="selected-pattern-chips" class="flex flex-wrap items-center gap-1.5"></div>
 
-            <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-white/10">
-                <button type="button" onclick="closeAddProblemModal()" class="btn-secondary h-9 px-4 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors">
-                    Cancel
-                </button>
-                <button type="submit" class="h-9 px-5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all shadow-lg shadow-orange-600/20">
-                    Save Problem
-                </button>
+                                    <!-- Inline search / add input -->
+                                    <input 
+                                        type="text" 
+                                        id="pattern-search-input" 
+                                        placeholder="Search or add pattern..." 
+                                        oninput="handlePatternSearch(this.value)" 
+                                        onkeydown="handlePatternKeydown(event)"
+                                        class="flex-1 min-w-[130px] text-xs bg-transparent border-0 outline-none p-0 text-white placeholder:text-slate-500 font-mono"
+                                    >
+                                </div>
+
+                                <!-- Dropdown Search Results List -->
+                                <div id="pattern-dropdown" class="hidden absolute z-30 left-0 right-0 mt-1 max-h-36 overflow-y-auto rounded-xl shadow-2xl p-1 text-xs space-y-0.5 border" style="background-color: var(--color-bg-elevated); border-color: var(--color-border-base);"></div>
+                            </div>
+                            <div id="pattern-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Please select at least one pattern.</div>
+
+                            <!-- Frequent User Patterns (Single line, 2-3 patterns only, user-specific) -->
+                            {% if user_top_patterns %}
+                            <div class="flex items-center gap-1.5 overflow-hidden whitespace-nowrap pt-0.5">
+                                <span class="text-[10px] text-slate-500 font-mono shrink-0">Top:</span>
+                                {% for pat in user_top_patterns %}
+                                <button type="button" onclick="addPatternTag('{{ pat|escapejs }}')" class="px-2 py-0.5 rounded-md text-[11px] font-mono border transition-colors cursor-pointer hover:border-orange-500/50 hover:text-orange-400" style="background-color: var(--color-btn-secondary-bg); border-color: var(--color-border-base); color: var(--color-text-body);">+ {{ pat }}</button>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Recognition Cue (Moved to left half below patterns) -->
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-semibold" style="color: var(--color-text-main);">
+                                    Recognition Cue <span class="text-rose-400">*</span>
+                                </label>
+                                <span id="cue-char-count" class="text-[10px] text-slate-500 font-mono">0 / 250</span>
+                            </div>
+                            <textarea 
+                                id="modal-recognition-cue" 
+                                name="recognition_cue" 
+                                rows="2" 
+                                maxlength="250"
+                                placeholder="Observation trigger: how to recognize this problem or approach." 
+                                onfocus="handleTextareaFocus(this)"
+                                onblur="handleTextareaBlur(this, 250)"
+                                oninput="handleTextareaInput(this, 'cue-char-count', 250, 'cue-error')"
+                                class="w-full px-3 py-2 rounded-xl text-xs focus:border-orange-500 focus:outline-none transition-all resize-y"
+                                required
+                            ></textarea>
+                            <div id="cue-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Recognition cue is required.</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column: Mistakes & Traps, and Expanded Personal Notes -->
+                    <div class="space-y-4 flex flex-col justify-between">
+                        
+                        <!-- Mistakes & Traps (300 chars) -->
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-semibold" style="color: var(--color-text-main);">
+                                    Mistakes &amp; Traps
+                                </label>
+                                <span id="mistakes-char-count" class="text-[10px] text-slate-500 font-mono">0 / 300</span>
+                            </div>
+                            <textarea 
+                                id="modal-mistakes" 
+                                name="mistakes" 
+                                rows="2" 
+                                maxlength="300"
+                                placeholder="Edge case traps or mistakes made during problem solving." 
+                                onfocus="handleTextareaFocus(this)"
+                                onblur="handleTextareaBlur(this, 300)"
+                                oninput="handleTextareaInput(this, 'mistakes-char-count', 300, null)"
+                                class="w-full px-3 py-2 rounded-xl text-xs focus:border-orange-500 focus:outline-none transition-all resize-y"
+                            ></textarea>
+                        </div>
+
+                        <!-- Personal Notes (600 chars - More space allocated for notes) -->
+                        <div class="space-y-1 flex-1 flex flex-col">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-semibold" style="color: var(--color-text-main);">
+                                    Notes <span class="text-rose-400">*</span>
+                                </label>
+                                <span id="notes-char-count" class="text-[10px] text-slate-500 font-mono">0 / 600</span>
+                            </div>
+                            <textarea 
+                                id="modal-notes" 
+                                name="notes" 
+                                rows="4" 
+                                maxlength="600"
+                                placeholder="Key implementation takeaways, invariants, and complexity notes." 
+                                onfocus="handleTextareaFocus(this)"
+                                onblur="handleTextareaBlur(this, 600)"
+                                oninput="handleTextareaInput(this, 'notes-char-count', 600, 'notes-error')"
+                                class="w-full flex-1 px-3 py-2 rounded-xl text-xs focus:border-orange-500 focus:outline-none transition-all resize-y min-h-[96px]"
+                                required
+                            ></textarea>
+                            <div id="notes-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Personal notes are required.</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Recall Performance Section (Spans Full Width Below Both Columns) -->
+                <div id="fsrs-rating-container" class="pt-3 border-t space-y-2 mt-3" style="border-color: var(--color-border-base);">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-xs font-semibold" style="color: var(--color-text-title);">
+                                Recall Performance <span class="text-rose-400">*</span>
+                            </label>
+                            <p class="text-[11px]" style="color: var(--color-text-muted);">How well did you recall or solve this problem?</p>
+                        </div>
+                        <span id="initial-rating-label" class="text-xs font-mono font-medium text-slate-400">Not selected</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <!-- Forgot: Red #FF1744 -->
+                        <button 
+                            type="button" 
+                            id="init-btn-forgot" 
+                            onclick="setInitialRating('Forgot')" 
+                            class="init-rating-btn p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer"
+                            style="background-color: var(--color-bg-input); border-color: var(--color-border-base);"
+                        >
+                            <div class="text-[#D50000] dark:text-[#FF1744] font-bold text-xs">Forgot</div>
+                            <div class="text-[10px] leading-tight" style="color: var(--color-text-muted);">Needed solution</div>
+                        </button>
+
+                        <!-- Hard: Yellow #FFD600 -->
+                        <button 
+                            type="button" 
+                            id="init-btn-hard" 
+                            onclick="setInitialRating('Hard')" 
+                            class="init-rating-btn p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer"
+                            style="background-color: var(--color-bg-input); border-color: var(--color-border-base);"
+                        >
+                            <div class="text-[#B45309] dark:text-[#FFD600] font-bold text-xs">Hard</div>
+                            <div class="text-[10px] leading-tight" style="color: var(--color-text-muted);">Needed hints/notes</div>
+                        </button>
+
+                        <!-- Medium / Good: Lime #AEEA00 -->
+                        <button 
+                            type="button" 
+                            id="init-btn-medium" 
+                            onclick="setInitialRating('Medium')" 
+                            class="init-rating-btn p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer"
+                            style="background-color: var(--color-bg-input); border-color: var(--color-border-base);"
+                        >
+                            <div class="text-[#558B2F] dark:text-[#AEEA00] font-bold text-xs">Medium</div>
+                            <div class="text-[10px] leading-tight" style="color: var(--color-text-muted);">Solved with effort</div>
+                        </button>
+
+                        <!-- Easy: Green #00C853 -->
+                        <button 
+                            type="button" 
+                            id="init-btn-easy" 
+                            onclick="setInitialRating('Easy')" 
+                            class="init-rating-btn p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer"
+                            style="background-color: var(--color-bg-input); border-color: var(--color-border-base);"
+                        >
+                            <div class="text-[#009624] dark:text-[#00C853] font-bold text-xs">Easy</div>
+                            <div class="text-[10px] leading-tight" style="color: var(--color-text-muted);">Quick &amp; independent</div>
+                        </button>
+                    </div>
+                    <div id="rating-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Please select recall performance.</div>
+                </div>
+
+                <!-- Action Buttons Row (Bottom Right) -->
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t mt-3" style="border-color: var(--color-border-base);">
+                    <button type="button" onclick="closeAddProblemModal()" class="h-9 px-4 rounded-xl text-xs font-medium cursor-pointer transition-colors border" style="background-color: var(--color-btn-secondary-bg); border-color: var(--color-btn-secondary-border); color: var(--color-btn-secondary-text); transform: none !important; box-shadow: none !important;">
+                        Cancel
+                    </button>
+                    <button type="submit" id="btn-submit-problem" class="btn-primary h-9 px-5 rounded-xl text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all shadow-lg shadow-orange-600/20 cursor-pointer flex items-center gap-1.5">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                        <span id="btn-submit-text">Add Problem</span>
+                    </button>
+                </div>
+
             </div>
         </form>
     </div>
@@ -306,23 +572,796 @@
 
 {% block extra_scripts %}
 <script>
+    // State for multi-select pattern tags and modal logic
+    let selectedPatterns = new Set();
+    let urlDebounceTimer = null;
+    let currentInitialRating = null;
+
     function openAddProblemModal() {
         document.getElementById('addProblemModal').classList.remove('hidden');
+        const urlInput = document.getElementById('modal-problem-url');
+        if (urlInput && !urlInput.value.trim()) {
+            lockFormBody();
+        }
+        setTimeout(() => {
+            if (urlInput) urlInput.focus();
+        }, 100);
+        if (window.lucide) lucide.createIcons();
     }
 
     function closeAddProblemModal() {
         document.getElementById('addProblemModal').classList.add('hidden');
+        resetAddProblemForm();
+    }
+
+    function resetAddProblemForm() {
+        document.getElementById('addProblemForm').reset();
+        revertModalToNormal();
+    }
+
+    function revertModalToNormal() {
+        const pill = document.getElementById('already-added-pill');
+        if (pill) pill.classList.add('hidden');
+
+        const fsrsBox = document.getElementById('fsrs-rating-container');
+        if (fsrsBox) fsrsBox.classList.remove('hidden');
+
+        const submitText = document.getElementById('btn-submit-text');
+        if (submitText) submitText.textContent = 'Add Problem';
+
+        // Clear hidden tracking fields
+        const canonical = document.getElementById('modal-canonical-url');
+        if (canonical) canonical.value = '';
+        const platform = document.getElementById('modal-platform');
+        if (platform) platform.value = 'leetcode';
+        const num = document.getElementById('modal-problem-number');
+        if (num) num.value = '';
+        const userSpec = document.getElementById('modal-is-user-specific');
+        if (userSpec) userSpec.value = 'false';
+
+        // Clear and unlock Title & Difficulty
+        const titleInput = document.getElementById('modal-problem-title');
+        if (titleInput) titleInput.value = '';
+        selectDifficulty('');
+        unlockTitle();
+        unlockDiff();
+
+        // Clear textarea inputs, fullValue datasets, and character counts
+        setTextareaValue('modal-recognition-cue', 'cue-char-count', 250, '');
+        setTextareaValue('modal-mistakes', 'mistakes-char-count', 300, '');
+        setTextareaValue('modal-notes', 'notes-char-count', 600, '');
+
+        // Clear patterns
+        selectedPatterns.clear();
+        renderPatternChips();
+
+        // Clear rating
+        resetInitialRating();
+        hideUrlFeedback();
+
+        // Clear error text feedback
+        clearAllFieldErrors();
+
+        // Lock form body until a valid URL is provided
+        lockFormBody();
+    }
+
+    // Gated Access Controls
+    function lockFormBody() {
+        const body = document.getElementById('modal-form-body');
+        if (body) {
+            body.classList.add('opacity-30', 'pointer-events-none', 'select-none');
+        }
+        const hint = document.getElementById('url-prompt-hint');
+        if (hint) hint.classList.remove('hidden');
+    }
+
+    function unlockFormBody() {
+        const body = document.getElementById('modal-form-body');
+        if (body) {
+            body.classList.remove('opacity-30', 'pointer-events-none', 'select-none');
+        }
+        const hint = document.getElementById('url-prompt-hint');
+        if (hint) hint.classList.add('hidden');
+    }
+
+    // Theme-Appropriate Segmented Difficulty Selector
+    function selectDifficulty(diff) {
+        clearFieldError('diff-error');
+        const hidden = document.getElementById('modal-problem-difficulty');
+        if (hidden) hidden.value = diff || '';
+
+        const btnEasy = document.getElementById('diff-btn-easy');
+        const btnMed = document.getElementById('diff-btn-medium');
+        const btnHard = document.getElementById('diff-btn-hard');
+
+        const baseBtnClass = 'diff-btn py-1.5 text-center rounded-lg text-[11px] font-medium transition-all cursor-pointer';
+
+        if (btnEasy) {
+            if (diff === 'Easy') {
+                btnEasy.className = `${baseBtnClass} bg-[#00C853]/20 border border-[#00C853] text-[#009624] dark:text-[#00C853] font-bold shadow-sm`;
+            } else {
+                btnEasy.className = `${baseBtnClass} border-transparent text-slate-400 hover:text-emerald-400`;
+            }
+        }
+        if (btnMed) {
+            if (diff === 'Medium') {
+                btnMed.className = `${baseBtnClass} bg-[#AEEA00]/20 border border-[#AEEA00] text-[#558B2F] dark:text-[#AEEA00] font-bold shadow-sm`;
+            } else {
+                btnMed.className = `${baseBtnClass} border-transparent text-slate-400 hover:text-amber-400`;
+            }
+        }
+        if (btnHard) {
+            if (diff === 'Hard') {
+                btnHard.className = `${baseBtnClass} bg-[#FF1744]/20 border border-[#FF1744] text-[#D50000] dark:text-[#FF1744] font-bold shadow-sm`;
+            } else {
+                btnHard.className = `${baseBtnClass} border-transparent text-slate-400 hover:text-rose-400`;
+            }
+        }
+    }
+
+    function lockDiff() {
+        const sel = document.getElementById('diff-selector');
+        const diffLock = document.getElementById('diff-lock-badge');
+        if (sel) {
+            sel.classList.add('pointer-events-none', 'opacity-70', 'cursor-not-allowed');
+        }
+        if (diffLock) diffLock.classList.remove('hidden');
+    }
+
+    function unlockDiff() {
+        const sel = document.getElementById('diff-selector');
+        const diffLock = document.getElementById('diff-lock-badge');
+        if (sel) {
+            sel.classList.remove('pointer-events-none', 'opacity-70', 'cursor-not-allowed');
+        }
+        if (diffLock) diffLock.classList.add('hidden');
+    }
+
+    function lockTitle() {
+        const titleInput = document.getElementById('modal-problem-title');
+        const titleLock = document.getElementById('title-lock-badge');
+        if (titleInput) {
+            titleInput.readOnly = true;
+            titleInput.classList.add('cursor-not-allowed', 'opacity-80');
+        }
+        if (titleLock) titleLock.classList.remove('hidden');
+    }
+
+    function unlockTitle() {
+        const titleInput = document.getElementById('modal-problem-title');
+        const titleLock = document.getElementById('title-lock-badge');
+        if (titleInput) {
+            titleInput.readOnly = false;
+            titleInput.classList.remove('cursor-not-allowed', 'opacity-80');
+        }
+        if (titleLock) titleLock.classList.add('hidden');
+    }
+
+    // Textarea In-Place Truncation on User Input / Blur
+    function handleTextareaFocus(el) {
+        if (el.dataset.fullValue !== undefined) {
+            el.value = el.dataset.fullValue;
+        }
+    }
+
+    function handleTextareaInput(el, counterId, maxLen, errorId) {
+        if (errorId) clearFieldError(errorId);
+        el.dataset.fullValue = el.value;
+
+        const counter = document.getElementById(counterId);
+        if (counter) {
+            const len = el.value.length;
+            counter.textContent = `${len} / ${maxLen}`;
+            if (len >= maxLen) {
+                counter.className = 'text-[10px] text-rose-400 font-mono font-bold';
+            } else if (len >= maxLen * 0.85) {
+                counter.className = 'text-[10px] text-amber-400 font-mono';
+            } else {
+                counter.className = 'text-[10px] text-slate-500 font-mono';
+            }
+        }
+    }
+
+    function handleTextareaBlur(el, maxLen) {
+        const fullText = el.dataset.fullValue !== undefined ? el.dataset.fullValue : el.value;
+        el.dataset.fullValue = fullText;
+
+        const trimmed = fullText.trim();
+        if (trimmed.length > 55 || trimmed.includes('\n')) {
+            const firstLine = trimmed.split('\n')[0].trim();
+            const snippet = firstLine.length > 50 ? firstLine.slice(0, 50).trim() : firstLine;
+            el.value = snippet + '...';
+        } else {
+            el.value = trimmed;
+        }
+    }
+
+    function setTextareaValue(textareaId, counterId, maxLen, val) {
+        const el = document.getElementById(textareaId);
+        if (!el) return;
+        const text = (val !== null && val !== undefined) ? String(val) : '';
+        el.value = text;
+        el.dataset.fullValue = text;
+
+        const counter = document.getElementById(counterId);
+        if (counter) {
+            const len = text.length;
+            counter.textContent = `${len} / ${maxLen}`;
+            if (len >= maxLen) {
+                counter.className = 'text-[10px] text-rose-400 font-mono font-bold';
+            } else if (len >= maxLen * 0.85) {
+                counter.className = 'text-[10px] text-amber-400 font-mono';
+            } else {
+                counter.className = 'text-[10px] text-slate-500 font-mono';
+            }
+        }
+
+        handleTextareaBlur(el, maxLen);
+    }
+
+    // Initial Recall Performance Selector
+    const initialRatingConfig = {
+        'Forgot': {
+            label: 'Forgot (needed solution)',
+            textColor: 'text-[#D50000] dark:text-[#FF1744]',
+            activeClasses: 'border-2 border-[#FF1744] bg-[#FF1744]/15 ring-1 ring-[#FF1744]/30 shadow-md',
+            hoverBorder: 'hover:border-[#FF1744]/50'
+        },
+        'Hard': {
+            label: 'Hard (needed hints/notes)',
+            textColor: 'text-[#B45309] dark:text-[#FFD600]',
+            activeClasses: 'border-2 border-[#FFD600] bg-[#FFD600]/15 ring-1 ring-[#FFD600]/30 shadow-md',
+            hoverBorder: 'hover:border-[#FFD600]/50'
+        },
+        'Medium': {
+            label: 'Medium (solved with effort)',
+            textColor: 'text-[#558B2F] dark:text-[#AEEA00]',
+            activeClasses: 'border-2 border-[#AEEA00] bg-[#AEEA00]/15 ring-1 ring-[#AEEA00]/30 shadow-md',
+            hoverBorder: 'hover:border-[#AEEA00]/50'
+        },
+        'Easy': {
+            label: 'Easy (solved quickly & independently)',
+            textColor: 'text-[#009624] dark:text-[#00C853]',
+            activeClasses: 'border-2 border-[#00C853] bg-[#00C853]/15 ring-1 ring-[#00C853]/30 shadow-md',
+            hoverBorder: 'hover:border-[#00C853]/50'
+        }
+    };
+
+    function resetInitialRating() {
+        currentInitialRating = null;
+        const input = document.getElementById('modal-initial-rating');
+        if (input) input.value = '';
+        const label = document.getElementById('initial-rating-label');
+        if (label) {
+            label.textContent = 'Not selected';
+            label.className = 'text-xs font-mono font-medium text-slate-400';
+        }
+        ['Forgot', 'Hard', 'Medium', 'Easy'].forEach(r => {
+            const btn = document.getElementById(`init-btn-${r.toLowerCase()}`);
+            if (!btn) return;
+            const cfg = initialRatingConfig[r];
+            btn.className = `init-rating-btn p-3 rounded-xl border ${cfg.hoverBorder} text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer opacity-85 hover:opacity-100`;
+            btn.style.backgroundColor = 'var(--color-bg-input)';
+            btn.style.borderColor = 'var(--color-border-base)';
+        });
+    }
+
+    function setInitialRating(rating) {
+        clearFieldError('rating-error');
+        currentInitialRating = rating;
+        document.getElementById('modal-initial-rating').value = rating;
+        const label = document.getElementById('initial-rating-label');
+        if (label) {
+            label.textContent = rating;
+            label.className = `text-xs font-mono font-bold ${initialRatingConfig[rating].textColor}`;
+        }
+
+        ['Forgot', 'Hard', 'Medium', 'Easy'].forEach(r => {
+            const btn = document.getElementById(`init-btn-${r.toLowerCase()}`);
+            if (!btn) return;
+            const cfg = initialRatingConfig[r];
+            if (r === rating) {
+                btn.className = `init-rating-btn p-3 rounded-xl ${cfg.activeClasses} text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer`;
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
+            } else {
+                btn.className = `init-rating-btn p-3 rounded-xl border ${cfg.hoverBorder} text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer opacity-70 hover:opacity-100`;
+                btn.style.backgroundColor = 'var(--color-bg-input)';
+                btn.style.borderColor = 'var(--color-border-base)';
+            }
+        });
+    }
+
+    // URL Validation to prevent abuse
+    function isValidProblemUrl(str) {
+        if (!str || typeof str !== 'string') return false;
+        const s = str.trim();
+        if (s.length < 7) return false;
+        const pattern = /^(https?:\/\/)?([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(:\d{1,5})?(\/.*)?$/i;
+        return pattern.test(s);
+    }
+
+    // URL Input Debounce & Paste Listeners
+    function handleUrlPaste(e) {
+        hideUrlFeedback();
+        setTimeout(() => {
+            triggerUrlInspection(true);
+        }, 100);
+    }
+
+    function handleUrlInputDebounced() {
+        hideUrlFeedback();
+        clearTimeout(urlDebounceTimer);
+        const url = document.getElementById('modal-problem-url').value.trim();
+
+        if (!url) {
+            // User cleared or removed URL -> revert back to normal fresh state
+            revertModalToNormal();
+            return;
+        }
+
+        if (!isValidProblemUrl(url)) {
+            // Incomplete URL: keep form body gated
+            lockFormBody();
+            return;
+        }
+
+        // Valid URL syntax -> debounced auto-inspection
+        urlDebounceTimer = setTimeout(() => {
+            triggerUrlInspection(false);
+        }, 400);
+    }
+
+    // Inspection Logic with Loading Microanimation and UI Reversion
+    async function triggerUrlInspection(force = false) {
+        const urlInput = document.getElementById('modal-problem-url');
+        const url = urlInput.value.trim();
+        if (!url) {
+            if (force) {
+                showUrlFeedback('error', 'Please enter a problem link.');
+            }
+            return;
+        }
+
+        if (!isValidProblemUrl(url)) {
+            if (force) {
+                showUrlFeedback('error', 'Please enter a valid web URL.');
+            }
+            return;
+        }
+
+        const inspectBtn = document.getElementById('btn-inspect-url');
+        const inspectText = document.getElementById('btn-inspect-text');
+        if (inspectBtn) inspectBtn.disabled = true;
+        if (inspectText) {
+            // Loading microanimation: spinner without changing fixed button width
+            inspectText.innerHTML = '<svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+        }
+
+        showUrlFeedback('loading', 'Checking problem link...');
+
+        try {
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+            const response = await fetch('/api/inspect-problem-url/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ url: url })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                showUrlFeedback('error', data.error || 'Problem link could not be verified.');
+                lockFormBody();
+                return;
+            }
+
+            // Valid problem URL verified -> unlock form body
+            unlockFormBody();
+
+            // Set canonical URL and metadata
+            document.getElementById('modal-canonical-url').value = data.canonical_url;
+            document.getElementById('modal-platform').value = data.platform;
+            if (data.problem_number) {
+                document.getElementById('modal-problem-number').value = data.problem_number;
+            }
+            document.getElementById('modal-is-user-specific').value = data.is_user_specific ? 'true' : 'false';
+
+            const titleInput = document.getElementById('modal-problem-title');
+            const pill = document.getElementById('already-added-pill');
+            const fsrsBox = document.getElementById('fsrs-rating-container');
+            const submitText = document.getElementById('btn-submit-text');
+
+            // CASE A: User has ALREADY ADDED this problem
+            if (data.already_added) {
+                if (pill) pill.classList.remove('hidden');
+                if (fsrsBox) fsrsBox.classList.add('hidden'); // Do not show or apply recall states
+                if (submitText) submitText.textContent = 'Update Notes';
+
+                if (data.title) titleInput.value = data.title;
+                if (data.difficulty) selectDifficulty(data.difficulty);
+
+                // Title and difficulty locked unless user-specific problem
+                if (data.is_user_specific) {
+                    unlockTitle();
+                    unlockDiff();
+                } else {
+                    lockTitle();
+                    lockDiff();
+                }
+
+                // Populate existing cues, mistakes, notes, and patterns with in-textarea truncation
+                setTextareaValue('modal-recognition-cue', 'cue-char-count', 250, data.recognition_cue || '');
+                setTextareaValue('modal-mistakes', 'mistakes-char-count', 300, data.mistakes || '');
+                setTextareaValue('modal-notes', 'notes-char-count', 600, data.notes || '');
+
+                if (data.patterns && Array.isArray(data.patterns)) {
+                    selectedPatterns.clear();
+                    data.patterns.forEach(p => selectedPatterns.add(p));
+                    renderPatternChips();
+                }
+
+                hideUrlFeedback();
+                if (window.lucide) lucide.createIcons();
+                return;
+            }
+
+            // CASE B: NEW Problem addition
+            if (pill) pill.classList.add('hidden');
+            if (fsrsBox) fsrsBox.classList.remove('hidden');
+            if (submitText) submitText.textContent = 'Add Problem';
+
+            // Reset notes, cues, mistakes, patterns, and rating if previous problem was already added
+            setTextareaValue('modal-recognition-cue', 'cue-char-count', 250, '');
+            setTextareaValue('modal-mistakes', 'mistakes-char-count', 300, '');
+            setTextareaValue('modal-notes', 'notes-char-count', 600, '');
+            selectedPatterns.clear();
+            renderPatternChips();
+            resetInitialRating();
+
+            if (data.title) {
+                titleInput.value = data.title;
+            } else {
+                titleInput.value = '';
+            }
+
+            if (data.difficulty && ['Easy', 'Medium', 'Hard'].includes(data.difficulty)) {
+                selectDifficulty(data.difficulty);
+            } else {
+                selectDifficulty('');
+            }
+
+            // Field locks based on source
+            if (data.is_title_locked) {
+                lockTitle();
+            } else {
+                unlockTitle();
+            }
+
+            if (data.is_diff_locked) {
+                lockDiff();
+            } else {
+                unlockDiff();
+            }
+
+            // User-centric feedback message (No internal architecture or FSRS jargon)
+            if (data.source === 'database' || data.source === 'leetcode_api') {
+                showUrlFeedback('success', 'Problem details loaded.');
+            } else if (data.source === 'slug') {
+                showUrlFeedback('info', 'Please select problem difficulty.');
+            } else {
+                showUrlFeedback('info', 'Please enter title and difficulty.');
+            }
+
+            if (window.lucide) lucide.createIcons();
+
+        } catch (err) {
+            console.error('Inspection error:', err);
+            showUrlFeedback('error', 'Problem link could not be verified.');
+            lockFormBody();
+        } finally {
+            if (inspectBtn) inspectBtn.disabled = false;
+            if (inspectText) inspectText.innerHTML = 'Fetch';
+        }
+    }
+
+    function showUrlFeedback(type, message) {
+        const box = document.getElementById('url-feedback-box');
+        if (!box) return;
+        box.classList.remove('hidden');
+
+        if (type === 'loading') {
+            box.className = 'text-[11px] font-mono text-slate-400 mt-1';
+        } else if (type === 'success') {
+            box.className = 'text-[11px] font-mono text-emerald-400 mt-1';
+        } else if (type === 'warning' || type === 'info') {
+            box.className = 'text-[11px] font-mono text-amber-400 mt-1';
+        } else {
+            box.className = 'text-[11px] font-mono text-rose-400 mt-1';
+        }
+        box.textContent = message;
+    }
+
+    function hideUrlFeedback() {
+        const box = document.getElementById('url-feedback-box');
+        if (box) box.classList.add('hidden');
+    }
+
+    // Pattern Multi-Select Logic (Chips inside input)
+    function addPatternTag(name) {
+        clearFieldError('pattern-error');
+        const cleanName = name.trim();
+        if (!cleanName) return;
+        selectedPatterns.add(cleanName);
+        renderPatternChips();
+        const searchInput = document.getElementById('pattern-search-input');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+        closePatternDropdown();
+    }
+
+    function removePatternTag(name) {
+        selectedPatterns.delete(name);
+        renderPatternChips();
+        const searchInput = document.getElementById('pattern-search-input');
+        if (searchInput) searchInput.focus();
+    }
+
+    function renderPatternChips() {
+        const box = document.getElementById('selected-pattern-chips');
+        const searchInput = document.getElementById('pattern-search-input');
+        if (!box) return;
+
+        box.innerHTML = '';
+        selectedPatterns.forEach(pat => {
+            const chip = document.createElement('span');
+            chip.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-mono font-medium border border-orange-500/30 text-orange-400 bg-orange-500/10 shadow-sm';
+            chip.innerHTML = `
+                <span>${pat}</span>
+                <button type="button" onclick="removePatternTag('${pat.replace(/'/g, "\\'")}')" class="text-orange-400 hover:text-white transition-colors cursor-pointer text-xs leading-none ml-0.5" title="Remove">&times;</button>
+            `;
+            box.appendChild(chip);
+        });
+
+        if (searchInput) {
+            if (selectedPatterns.size > 0) {
+                searchInput.placeholder = 'Add pattern...';
+            } else {
+                searchInput.placeholder = 'Search or add pattern...';
+            }
+        }
+    }
+
+    let patternSearchTimeout = null;
+    function handlePatternSearch(q) {
+        clearTimeout(patternSearchTimeout);
+        const query = q.trim();
+        if (!query) {
+            closePatternDropdown();
+            return;
+        }
+
+        patternSearchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`/api/patterns/search/?q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                renderPatternDropdown(data.patterns, query);
+            } catch (e) {
+                console.error('Pattern search error:', e);
+            }
+        }, 200);
+    }
+
+    function renderPatternDropdown(patterns, query) {
+        const dropdown = document.getElementById('pattern-dropdown');
+        if (!dropdown) return;
+
+        dropdown.innerHTML = '';
+        const lowerQ = query.toLowerCase();
+        let exactMatch = false;
+
+        patterns.forEach(p => {
+            if (p.name.toLowerCase() === lowerQ) exactMatch = true;
+            if (selectedPatterns.has(p.name)) return;
+
+            const item = document.createElement('div');
+            item.className = 'px-3 py-1.5 rounded-lg hover:bg-orange-600 hover:text-white text-slate-300 text-xs cursor-pointer flex items-center justify-between font-mono transition-colors';
+            item.innerHTML = `<span>${p.name}</span><span class="text-[10px] opacity-60">${p.is_custom ? 'my tag' : 'standard'}</span>`;
+            item.onclick = () => addPatternTag(p.name);
+            dropdown.appendChild(item);
+        });
+
+        if (!exactMatch && query) {
+            const createItem = document.createElement('div');
+            createItem.className = 'px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-600 hover:text-white text-orange-400 text-xs cursor-pointer flex items-center justify-between font-mono transition-colors border-t border-white/5';
+            createItem.innerHTML = `<span>+ Add "<strong>${query}</strong>"</span><span class="text-[10px]">custom</span>`;
+            createItem.onclick = () => addPatternTag(query);
+            dropdown.appendChild(createItem);
+        }
+
+        dropdown.classList.remove('hidden');
+    }
+
+    function closePatternDropdown() {
+        const dropdown = document.getElementById('pattern-dropdown');
+        if (dropdown) dropdown.classList.add('hidden');
+    }
+
+    function handlePatternKeydown(e) {
+        const input = document.getElementById('pattern-search-input');
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const val = input.value.trim();
+            if (val) {
+                addPatternTag(val);
+                input.value = '';
+                closePatternDropdown();
+            }
+        } else if (e.key === 'Backspace' && input.value === '' && selectedPatterns.size > 0) {
+            // Backspace on empty input removes the last selected pattern tag
+            const arr = Array.from(selectedPatterns);
+            const last = arr[arr.length - 1];
+            removePatternTag(last);
+        } else if (e.key === 'Escape') {
+            closePatternDropdown();
+        }
+    }
+
+    // Text Feedback Error Handlers (Replacing colored box outlines)
+    function highlightFieldError(errorId) {
+        if (!errorId) return;
+        const el = document.getElementById(errorId);
+        if (el) el.classList.remove('hidden');
+    }
+
+    function clearFieldError(errorId) {
+        if (!errorId) return;
+        const el = document.getElementById(errorId);
+        if (el) el.classList.add('hidden');
+    }
+
+    function clearAllFieldErrors() {
+        [
+            'title-error',
+            'diff-error',
+            'pattern-error',
+            'cue-error',
+            'notes-error',
+            'rating-error'
+        ].forEach(clearFieldError);
+    }
+
+    // Form Submission with Clean Text Feedback Validation
+    async function handleRealProblemSubmit(e) {
+        e.preventDefault();
+        clearAllFieldErrors();
+
+        const url = document.getElementById('modal-problem-url').value.trim();
+        const title = document.getElementById('modal-problem-title').value.trim();
+        const difficulty = document.getElementById('modal-problem-difficulty').value;
+
+        const cueEl = document.getElementById('modal-recognition-cue');
+        const cue = (cueEl.dataset.fullValue !== undefined ? cueEl.dataset.fullValue : cueEl.value).trim();
+
+        const mistakesEl = document.getElementById('modal-mistakes');
+        const mistakes = (mistakesEl.dataset.fullValue !== undefined ? mistakesEl.dataset.fullValue : mistakesEl.value).trim();
+
+        const notesEl = document.getElementById('modal-notes');
+        const notes = (notesEl.dataset.fullValue !== undefined ? notesEl.dataset.fullValue : notesEl.value).trim();
+
+        const isUserSpecific = document.getElementById('modal-is-user-specific').value === 'true';
+        const isExisting = document.getElementById('already-added-pill') && !document.getElementById('already-added-pill').classList.contains('hidden');
+
+        if (!url) {
+            showUrlFeedback('error', 'Please enter problem link.');
+            document.getElementById('modal-problem-url')?.focus();
+            return;
+        }
+        if (!isValidProblemUrl(url)) {
+            showUrlFeedback('error', 'Please enter a valid web URL.');
+            document.getElementById('modal-problem-url')?.focus();
+            return;
+        }
+        if (!title) {
+            highlightFieldError('title-error');
+            document.getElementById('modal-problem-title')?.focus();
+            return;
+        }
+        if (!difficulty) {
+            highlightFieldError('diff-error');
+            return;
+        }
+        if (!selectedPatterns || selectedPatterns.size === 0) {
+            highlightFieldError('pattern-error');
+            document.getElementById('pattern-search-input')?.focus();
+            return;
+        }
+        if (!cue) {
+            highlightFieldError('cue-error');
+            cueEl.focus();
+            return;
+        }
+        if (!notes) {
+            highlightFieldError('notes-error');
+            notesEl.focus();
+            return;
+        }
+        if (!isExisting && !currentInitialRating) {
+            highlightFieldError('rating-error');
+            return;
+        }
+
+        const submitBtn = document.getElementById('btn-submit-problem');
+        const submitText = document.getElementById('btn-submit-text');
+        const prevText = submitText ? submitText.textContent : 'Save';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitText.textContent = 'Saving...';
+        }
+
+        try {
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+            const payload = {
+                url: url,
+                title: title,
+                difficulty: difficulty,
+                patterns: Array.from(selectedPatterns),
+                recognition_cue: cue,
+                mistakes: mistakes,
+                notes: notes,
+                initial_rating: currentInitialRating,
+                is_user_specific: isUserSpecific,
+            };
+
+            const response = await fetch('/problems/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast(isExisting ? 'Problem notes updated.' : 'Problem added to revision schedule.');
+                closeAddProblemModal();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 800);
+            } else {
+                showToast(data.error || 'Failed to save problem.');
+            }
+        } catch (err) {
+            console.error('Submission error:', err);
+            showToast('Network error while saving problem.');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitText.textContent = prevText;
+            }
+        }
     }
 
     function handleStartRevision() {
-        showToast('Starting active recall revision session for pending problems.');
+        showToast('Starting revision session.');
     }
 
-    function handleDummySubmit(e) {
-        e.preventDefault();
-        showToast('Problem added successfully.');
-        closeAddProblemModal();
-    }
+    // Close pattern dropdown on outside click
+    document.addEventListener('click', (e) => {
+        const inputContainer = document.getElementById('pattern-input-container');
+        const dropdown = document.getElementById('pattern-dropdown');
+        if (dropdown && !dropdown.contains(e.target) && inputContainer && !inputContainer.contains(e.target)) {
+            closePatternDropdown();
+        }
+    });
 
     // Keep authenticated users on the dashboard if they click the browser back button
     if (window.history && window.history.pushState) {
@@ -333,3 +1372,4 @@
     }
 </script>
 {% endblock %}
+
