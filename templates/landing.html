@@ -259,12 +259,12 @@
                                 <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Needed hints or notes.</div>
                             </button>
 
-                            <!-- Option 3: Medium (#AEEA00 Lime / Yellow-Green) -->
-                            <button type="button" id="btn-rating-medium" onclick="selectDemoRating('medium')" class="demo-rating-btn w-full p-3.5 rounded-xl border border-white/10 hover:border-[#AEEA00]/40 bg-slate-900/90 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer">
+                            <!-- Option 3: Good (#AEEA00 Lime / Yellow-Green) -->
+                            <button type="button" id="btn-rating-good" onclick="selectDemoRating('good')" class="demo-rating-btn w-full p-3.5 rounded-xl border border-white/10 hover:border-[#AEEA00]/40 bg-slate-900/90 text-left transition-all duration-200 flex flex-col justify-between min-h-[90px] cursor-pointer">
                                 <div class="text-[#558B2F] dark:text-[#AEEA00] font-bold text-xs">
-                                    Medium
+                                    Good
                                 </div>
-                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Solved independently, took effort.</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Recognized pattern, solved with effort.</div>
                             </button>
 
                             <!-- Option 4: Easy (🟢 #00C853 Vibrant Green) -->
@@ -403,7 +403,7 @@
                 </div>
                 <h3 class="text-sm font-bold text-white mb-1">Progress Tracking & Streaks</h3>
                 <p class="text-slate-400 text-xs leading-relaxed">
-                    Track revision history and streaks across all four recall ratings: Forgot, Hard, Medium, and Easy.
+                    Track revision history and streaks across all four recall ratings: Forgot, Hard, Good, and Easy.
                 </p>
             </div>
 
@@ -556,10 +556,17 @@
             hoverBorder: 'hover:border-[#FFD600]/50',
             dotColor: 'bg-[#FFD600]'
         },
-        'medium': {
-            label: 'Medium (solved with effort)',
+        'good': {
+            label: 'Good (recognized pattern independently)',
             textColor: 'text-[#558B2F] dark:text-[#AEEA00]',
-            activeClasses: 'selected-medium border-2 border-[#AEEA00] bg-[#AEEA00]/10 dark:bg-[#AEEA00]/15 ring-1 ring-[#AEEA00]/30 shadow-lg shadow-[#AEEA00]/15',
+            activeClasses: 'selected-good selected-medium border-2 border-[#AEEA00] bg-[#AEEA00]/10 dark:bg-[#AEEA00]/15 ring-1 ring-[#AEEA00]/30 shadow-lg shadow-[#AEEA00]/15',
+            hoverBorder: 'hover:border-[#AEEA00]/50',
+            dotColor: 'bg-[#AEEA00]'
+        },
+        'medium': {
+            label: 'Good (recognized pattern independently)',
+            textColor: 'text-[#558B2F] dark:text-[#AEEA00]',
+            activeClasses: 'selected-good selected-medium border-2 border-[#AEEA00] bg-[#AEEA00]/10 dark:bg-[#AEEA00]/15 ring-1 ring-[#AEEA00]/30 shadow-lg shadow-[#AEEA00]/15',
             hoverBorder: 'hover:border-[#AEEA00]/50',
             dotColor: 'bg-[#AEEA00]'
         },
@@ -579,8 +586,9 @@
     };
 
     function updateRatingSelection(rating) {
+        if (rating === 'medium') rating = 'good';
         selectedRating = rating;
-        const ratings = ['forgot', 'hard', 'medium', 'easy'];
+        const ratings = ['forgot', 'hard', 'good', 'easy'];
 
         ratings.forEach(r => {
             const b = document.getElementById(`btn-rating-${r}`);

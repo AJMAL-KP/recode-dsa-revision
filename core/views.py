@@ -154,105 +154,84 @@ def dashboard_view(request):
     ensure_default_patterns()
     user_problems = UserProblem.objects.filter(user=request.user).select_related('problem', 'fsrs_card').prefetch_related('patterns').order_by('fsrs_card__due')
 
-    if user_problems.exists():
-        queue = []
-        for up in user_problems[:15]:
-            p_names = [p.name for p in up.patterns.all()]
-            queue.append({
-                'number': (up.problem.problem_number if up.problem else None) or up.id,
-                'title': up.title,
-                'difficulty': up.effective_difficulty,
-                'pattern': ', '.join(p_names[:2]) if p_names else 'General',
-                'is_completed': hasattr(up, 'fsrs_card') and not up.fsrs_card.is_due(),
-            })
+    queue = []
+    for up in user_problems[:25]:
+        p_names = [p.name for p in up.patterns.all()]
+        queue.append({
+            'number': (up.problem.problem_number if up.problem else None) or up.id,
+            'title': up.title,
+            'difficulty': up.effective_difficulty,
+            'pattern': ', '.join(p_names[:2]) if p_names else 'General',
+            'pattern_names': p_names,
+            'pattern_names_csv': ','.join(p_names),
+            'is_completed': hasattr(up, 'fsrs_card') and not up.fsrs_card.is_due(),
+        })
 
-        reviews = ReviewHistory.objects.filter(user_problem__user=request.user)
-        total_revs = reviews.count()
-        again_cnt = reviews.filter(rating=1).count()
-        hard_cnt = reviews.filter(rating=2).count()
-        good_cnt = reviews.filter(rating=3).count()
-        easy_cnt = reviews.filter(rating=4).count()
+    from .services.analytics_service import (
+        get_dashboard_analytics,
+        get_most_forgotten_problems,
+        get_forgotten_stats,
+        get_revision_heatmap_data,
+    )
+    stats, recall_stats = get_dashboard_analytics(request.user)
+    stats['preview_count'] = len(queue)
+    stats['completed_today'] = ReviewHistory.objects.filter(
+        user_problem__user=request.user,
+        reviewed_at__date=timezone.localdate()
+    ).count()
 
-        if total_revs > 0:
-            recall_success_pct = round(((good_cnt + easy_cnt) / total_revs) * 100)
-            recall_stats = {
-                'easy_count': easy_cnt,
-                'easy_pct': round((easy_cnt / total_revs) * 100),
-                'good_count': good_cnt,
-                'good_pct': round((good_cnt / total_revs) * 100),
-                'hard_count': hard_cnt,
-                'hard_pct': round((hard_cnt / total_revs) * 100),
-                'again_count': again_cnt,
-                'again_pct': round((again_cnt / total_revs) * 100),
-            }
+    most_forgotten = get_most_forgotten_problems(request.user, limit=5)
+    forgotten_stats = get_forgotten_stats(request.user)
+    heatmap_data = get_revision_heatmap_data(request.user, months=12)
+
+    revision_queue = queue
+
+    # Pattern recall analytics for user using weighted retention across all 4 FSRS states
+    user_patterns = Pattern.objects.filter(user_problems__user=request.user).distinct()
+    all_pattern_stats = []
+    for p in user_patterns:
+        p_revs = ReviewHistory.objects.filter(user_problem__user=request.user, user_problem__patterns=p)
+        tot = p_revs.count()
+        if tot > 0:
+            easy_cnt = p_revs.filter(rating=4).count()
+            good_cnt = p_revs.filter(rating=3).count()
+            hard_cnt = p_revs.filter(rating=2).count()
+            again_cnt = p_revs.filter(rating=1).count()
+            pct = round(((easy_cnt * 100) + (good_cnt * 75) + (hard_cnt * 50) + (again_cnt * 0)) / tot)
         else:
-            recall_success_pct = 100
-            recall_stats = {
-                'easy_count': 0, 'easy_pct': 0,
-                'good_count': 0, 'good_pct': 0,
-                'hard_count': 0, 'hard_pct': 0,
-                'again_count': 0, 'again_pct': 0,
-            }
+            pct = 100
+        prob_count = p.user_problems.filter(user=request.user).count()
+        all_pattern_stats.append({
+            'name': p.name,
+            'pct': pct,
+            'count': prob_count,
+            'revs_count': tot,
+        })
 
-        stats = {
-            'total_revs_done': total_revs,
-            'total_reviews': total_revs,
-            'total_problems': user_problems.count(),
-            'recall_success_pct': recall_success_pct,
-            'active_streak': 1 if total_revs > 0 else 0,
-            'max_streak': 1 if total_revs > 0 else 0,
-            'completed_today': reviews.filter(reviewed_at__date=timezone.now().date()).count(),
-            'preview_count': len(queue),
-        }
-        revision_queue = queue
-        pattern_stats = [
-            {'name': p.name, 'pct': 100, 'count': p.user_problems.filter(user=request.user).count()}
-            for p in Pattern.objects.filter(user_problems__user=request.user).distinct()[:6]
+    if not all_pattern_stats:
+        top_patterns = [
+            {'name': 'Binary Search', 'pct': 92, 'count': 4, 'revs_count': 12},
+            {'name': 'Two Pointers', 'pct': 88, 'count': 6, 'revs_count': 18},
+            {'name': 'Sliding Window', 'pct': 82, 'count': 5, 'revs_count': 14},
+            {'name': 'Hashing', 'pct': 78, 'count': 8, 'revs_count': 20},
+            {'name': 'Trees', 'pct': 74, 'count': 7, 'revs_count': 16},
         ]
-        if not pattern_stats:
-            pattern_stats = [
-                {'name': 'Binary Search', 'pct': 94, 'count': 18},
-                {'name': 'Arrays', 'pct': 88, 'count': 42},
-                {'name': 'Hashing', 'pct': 81, 'count': 31},
-                {'name': 'Sliding Window', 'pct': 71, 'count': 24},
-                {'name': 'Graphs', 'pct': 63, 'count': 16},
-                {'name': 'Dynamic Programming', 'pct': 52, 'count': 27},
-            ]
+        weak_patterns = [
+            {'name': 'Dynamic Programming', 'pct': 48, 'count': 7, 'revs_count': 15},
+            {'name': 'Graphs', 'pct': 56, 'count': 4, 'revs_count': 9},
+            {'name': 'Trie', 'pct': 62, 'count': 3, 'revs_count': 6},
+            {'name': 'Backtracking', 'pct': 68, 'count': 5, 'revs_count': 11},
+            {'name': 'Bit Manipulation', 'pct': 70, 'count': 3, 'revs_count': 5},
+        ]
+        total_patterns_count = 0
+        avg_pattern_retention = 85
+        weak_patterns_count = 0
     else:
-        stats = {
-            'total_revs_done': 83,
-            'total_reviews': 83,
-            'total_problems': 42,
-            'recall_success_pct': 75,
-            'active_streak': 5,
-            'max_streak': 12,
-            'completed_today': 2,
-            'preview_count': 8,
-        }
-        revision_queue = [
-            {'number': 1, 'title': 'Two Sum', 'difficulty': 'Easy', 'pattern': 'Hashing', 'is_completed': True},
-            {'number': 209, 'title': 'Minimum Size Subarray Sum', 'difficulty': 'Medium', 'pattern': 'Sliding Window', 'is_completed': True},
-            {'number': 33, 'title': 'Search in Rotated Sorted Array', 'difficulty': 'Medium', 'pattern': 'Binary Search', 'is_completed': False},
-            {'number': 56, 'title': 'Merge Intervals', 'difficulty': 'Medium', 'pattern': 'Intervals', 'is_completed': False},
-            {'number': 200, 'title': 'Number of Islands', 'difficulty': 'Medium', 'pattern': 'Graphs', 'is_completed': False},
-            {'number': 198, 'title': 'House Robber', 'difficulty': 'Medium', 'pattern': 'Dynamic Programming', 'is_completed': False},
-            {'number': 146, 'title': 'LRU Cache', 'difficulty': 'Medium', 'pattern': 'Design', 'is_completed': False},
-            {'number': 20, 'title': 'Valid Parentheses', 'difficulty': 'Easy', 'pattern': 'Stack', 'is_completed': False},
-        ]
-        recall_stats = {
-            'easy_count': 19, 'easy_pct': 23,
-            'good_count': 43, 'good_pct': 52,
-            'hard_count': 14, 'hard_pct': 17,
-            'again_count': 7, 'again_pct': 8,
-        }
-        pattern_stats = [
-            {'name': 'Binary Search', 'pct': 94, 'count': 18},
-            {'name': 'Arrays', 'pct': 88, 'count': 42},
-            {'name': 'Hashing', 'pct': 81, 'count': 31},
-            {'name': 'Sliding Window', 'pct': 71, 'count': 24},
-            {'name': 'Graphs', 'pct': 63, 'count': 16},
-            {'name': 'Dynamic Programming', 'pct': 52, 'count': 27},
-        ]
+        top_patterns = sorted(all_pattern_stats, key=lambda x: (-x['pct'], -x['count']))[:5]
+        weak_patterns = sorted(all_pattern_stats, key=lambda x: (x['pct'], -x['count']))[:5]
+        total_patterns_count = len(all_pattern_stats)
+        avg_pattern_retention = round(sum(p['pct'] for p in all_pattern_stats) / total_patterns_count)
+        weak_patterns_count = sum(1 for p in all_pattern_stats if p['pct'] < 70)
 
     # Query frequent user patterns (2-3 top patterns based on problems added by user)
     user_top_patterns = list(
@@ -262,13 +241,32 @@ def dashboard_view(request):
         .values_list('name', flat=True)[:3]
     )
 
+    user_frequency_patterns = list(
+        Pattern.objects.annotate(
+            user_usage_count=models.Count(
+                'user_problems',
+                filter=models.Q(user_problems__user=request.user)
+            )
+        )
+        .filter(models.Q(user__isnull=True) | models.Q(user=request.user))
+        .order_by('-user_usage_count', 'name')
+    )
+
     context = {
         'stats': stats,
         'revision_queue': revision_queue,
         'recall_stats': recall_stats,
-        'pattern_stats': pattern_stats,
-        'all_patterns': Pattern.objects.filter(models.Q(user__isnull=True) | models.Q(user=request.user)).order_by('name'),
+        'pattern_stats': top_patterns,
+        'top_patterns': top_patterns,
+        'weak_patterns': weak_patterns,
+        'total_patterns_count': total_patterns_count,
+        'avg_pattern_retention': avg_pattern_retention,
+        'weak_patterns_count': weak_patterns_count,
+        'all_patterns': user_frequency_patterns,
         'user_top_patterns': user_top_patterns,
+        'most_forgotten': most_forgotten,
+        'forgotten_stats': forgotten_stats,
+        'heatmap_data': heatmap_data,
     }
     return render(request, 'dashboard.html', context)
 
@@ -405,12 +403,15 @@ def add_problem_view(request):
         models.Q(problem__canonical_url=clean_url) | models.Q(user_url=clean_url)
     ).exists()
 
-    if not is_existing and initial_rating not in ('Easy', 'Medium', 'Hard', 'Forgot', 'Again'):
-        err_msg = 'Please select your initial recall performance (Easy, Medium, Hard, or Forgot).'
+    if not is_existing and initial_rating not in ('Easy', 'Good', 'Hard', 'Forgot', 'Again', 'Medium'):
+        err_msg = 'Please select your initial recall performance (Forgot, Hard, Good, or Easy).'
         if is_json:
             return JsonResponse({'success': False, 'error': err_msg}, status=400)
         messages.error(request, err_msg)
         return redirect('dashboard')
+
+    if initial_rating == 'Medium':
+        initial_rating = 'Good'
 
     try:
         user_problem, created = create_user_problem_with_fsrs(

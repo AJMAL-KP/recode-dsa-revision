@@ -7,128 +7,252 @@
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
     <!-- Top Section (Unboxed Header Area) -->
-    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-2">
+    <div class="flex flex-col lg:flex-row lg:items-stretch justify-between gap-6 pb-2">
         
         <!-- Left: Welcome & Description & Actions -->
-        <div class="space-y-4 max-w-xl">
+        <div class="flex flex-col justify-between max-w-xl space-y-4 lg:space-y-0">
             <div>
                 <div class="text-xs font-mono uppercase tracking-wider text-slate-400">ReCode &middot; Spaced Repetition Assistant</div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
                     Welcome, <span class="text-orange-400">{{ user.get_full_name|default:"Developer" }}</span>
                 </h1>
-                <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">
-                    Review your previously solved DSA problems through adaptive active recall and spaced repetition to retain patterns long-term.
+                <p class="text-sm text-slate-400 mt-2 leading-relaxed w-full sm:max-w-[420px]">
+                    Review your previously solved DSA problems through adaptive active recall and spaced repetition. Reinforce algorithmic patterns, target weak cues, and sustain recall retention.
                 </p>
             </div>
 
             <!-- Primary Actions -->
-            <div class="flex items-center gap-3 pt-1">
+            <div class="flex items-center gap-3 pt-3 lg:pt-0">
                 <button onclick="openAddProblemModal()" class="btn-secondary h-9 px-4 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-2">
                     <i data-lucide="plus" class="w-3.5 h-3.5 text-orange-400"></i>
                     <span>Add Problem</span>
                 </button>
-                <a href="#problems-container" class="h-9 px-5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center gap-2 shadow-lg shadow-orange-600/20">
+                <a href="#todays-revision-heading" class="h-9 px-5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 active:scale-[0.99] transition-all flex items-center gap-2 shadow-lg shadow-orange-600/20">
                     <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
                     <span>Start Revising</span>
                 </a>
             </div>
         </div>
 
-        <!-- Right: Metrics Top Row & Active Streak Just Below It -->
-        <div class="space-y-4 lg:text-right flex flex-col lg:items-end">
+        <!-- Right: Metrics Top Row & Dynamic Rocket Streak Track -->
+        <div class="space-y-4 lg:text-right flex flex-col lg:items-end w-full lg:w-auto">
             
-            <!-- Top Row: Total Reviews & Recall Success -->
-            <div class="flex items-center gap-8">
-                <div>
-                    <div class="text-xs font-medium text-slate-400">Total Reviews</div>
-                    <div class="text-2xl font-bold font-mono text-white mt-0.5">
-                        {{ stats.total_revs_done }}<span class="text-slate-500 text-base font-normal"> ({{ stats.total_problems }} Solved)</span>
+            <!-- Top Row: 4 Primary Metrics (Unboxed, matching exact width of cosmic streak canvas below) -->
+            <div class="w-full sm:w-[420px] grid grid-cols-4 gap-2 pb-1">
+                <!-- Problems -->
+                <div class="text-center">
+                    <div class="text-2xl sm:text-3xl font-bold font-mono text-white dark:text-white mt-0.5 tracking-tight">
+                        {{ stats.total_problems }}
+                    </div>
+                    <div class="text-[11px] sm:text-xs text-slate-400 font-medium mt-0.5 leading-tight">problems</div>
+                </div>
+
+                <!-- Revised (Total Card Ratings Count) -->
+                <div class="text-center">
+                    <div class="text-2xl sm:text-3xl font-bold font-mono text-white dark:text-white mt-0.5 tracking-tight">
+                        {{ stats.total_revs_done }}x
+                    </div>
+                    <div class="text-[11px] sm:text-xs text-slate-400 font-medium mt-0.5 leading-tight">revised</div>
+                </div>
+
+                <!-- Revisions (Total Active Days) -->
+                <div class="text-center">
+                    <div class="text-2xl sm:text-3xl font-bold font-mono text-white dark:text-white mt-0.5 tracking-tight">
+                        {{ stats.total_revision_days }}
+                    </div>
+                    <div class="text-[11px] sm:text-xs text-slate-400 font-medium mt-0.5 leading-tight">revisions</div>
+                </div>
+
+                <!-- Retention (Weighted across all 4 FSRS states) -->
+                <div class="text-center">
+                    <div class="text-2xl sm:text-3xl font-bold font-mono text-emerald-400 mt-0.5 tracking-tight">
+                        {{ stats.recall_success_pct }}%
+                    </div>
+                    <div class="text-[11px] sm:text-xs text-slate-400 font-medium mt-0.5 leading-tight">retention</div>
+                </div>
+            </div>
+
+            <!-- Below Row: Cosmic Sky Rocket Streak (No outlines, decorative stars & asteroids) -->
+            <div class="cosmic-streak-canvas rounded-2xl relative overflow-hidden p-3.5 sm:p-4 w-full sm:w-[420px] shadow-lg">
+                <!-- Cosmic Sky Background Layer: Stars & Asteroids (Pure lightweight SVGs) -->
+                <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                    <!-- Star 1: Prominent 4-point cosmic star (Top Left/Center) -->
+                    <svg class="cosmic-star absolute top-2.5 left-[30%] w-4 h-4 text-white/70 dark:text-white/80" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8Z"/>
+                    </svg>
+
+                    <!-- Star 2: Prominent 4-point cosmic star (Top Right) -->
+                    <svg class="cosmic-star cosmic-star-delayed-1 absolute top-2.5 right-[16%] w-4 h-4 text-amber-300/80 dark:text-amber-200/90" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8Z"/>
+                    </svg>
+
+                    <!-- Star 3: Prominent 4-point cosmic star (Bottom Center) -->
+                    <svg class="cosmic-star cosmic-star-delayed-2 absolute bottom-2 left-[50%] w-3.5 h-3.5 text-white/60 dark:text-white/70" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8Z"/>
+                    </svg>
+
+                    <!-- Scattered Asteroid & Stardust Dots -->
+                    <span class="cosmic-dot absolute top-3 left-[12%] w-1.5 h-1.5 rounded-full bg-white/60"></span>
+                    <span class="cosmic-dot absolute top-4 left-[46%] w-1 h-1 rounded-full bg-amber-200/70"></span>
+                    <span class="cosmic-dot absolute bottom-3 left-[20%] w-1 h-1 rounded-full bg-white/50"></span>
+                    <span class="cosmic-dot absolute bottom-3.5 left-[72%] w-1.5 h-1.5 rounded-full bg-orange-300/60"></span>
+                    <span class="cosmic-dot absolute top-3.5 right-[8%] w-1 h-1 rounded-full bg-white/60"></span>
+                    <span class="cosmic-dot absolute bottom-2.5 right-[32%] w-1 h-1 rounded-full bg-white/40"></span>
+                </div>
+
+                <!-- Streak Header Information: Top-Left Streak & Top-Right Max Streak -->
+                <div class="relative z-10 flex items-center justify-between text-xs mb-3">
+                    <div class="flex items-center gap-2">
+                        {% if stats.active_streak > 0 %}
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                        </span>
+                        <span class="text-slate-300 dark:text-slate-200 font-medium">
+                            Streak: <strong class="text-orange-400 font-mono text-sm">{{ stats.active_streak }} {% if stats.active_streak == 1 %}Day{% else %}Days{% endif %}</strong>
+                        </span>
+                        {% else %}
+                        <span class="inline-flex rounded-full h-2 w-2 bg-slate-500"></span>
+                        <span class="text-slate-400 font-medium">
+                            Streak: <strong class="text-slate-400 font-mono text-sm">0 Days</strong>
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Top-Right: Max Streak -->
+                    <div class="text-slate-400 font-mono text-[11px] sm:text-xs">
+                        Max streak: <strong class="text-white font-semibold">{{ stats.max_streak }}d</strong>
                     </div>
                 </div>
 
-                <div class="border-l border-white/10 pl-8">
-                    <div class="text-xs font-medium text-slate-400">Recall Success</div>
-                    <div class="text-2xl font-bold font-mono text-emerald-400 mt-0.5">{{ stats.recall_success_pct }}%</div>
-                    <div class="text-[11px] text-slate-400 font-mono">Good &amp; Easy</div>
-                </div>
-            </div>
+                <!-- Rocket Flight Path across the Cosmic Sky (Clean, inner track container) -->
+                <div class="relative z-10 w-full h-7 flex items-center px-4">
+                    <!-- Flight Trajectory Guide Line (Clean, borderless) -->
+                    <div class="w-full h-1 bg-white/10 dark:bg-white/10 rounded-full relative overflow-visible">
+                        <!-- Radiant Exhaust Progression Beam -->
+                        <div class="h-full rounded-full bg-gradient-to-r from-orange-600/40 via-orange-500 to-amber-400 transition-all duration-700 shadow-[0_0_12px_rgba(249,115,22,0.5)]" style="width: {{ stats.rocket.rocket_pct }}%;"></div>
 
-            <!-- Below Row: Active Streak with clean UI -->
-            <div class="pt-2 border-t border-white/10 w-full flex flex-col lg:items-end gap-1.5">
-                <div class="flex items-center justify-between lg:justify-end gap-4 text-xs">
-                    <span class="text-slate-300 font-medium">
-                        Active Streak: <strong class="text-orange-400 font-mono text-sm">{{ stats.active_streak }} Days</strong>
-                    </span>
-                    <span class="text-slate-500 font-mono text-[11px]">Longest: {{ stats.max_streak }} Days</span>
-                </div>
-                
-                <!-- Streak Progress Pips -->
-                <div class="flex items-center gap-1.5">
-                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 1"></span>
-                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 2"></span>
-                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 3"></span>
-                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 4"></span>
-                    <span class="h-2 w-7 rounded-full bg-orange-500 shadow-sm shadow-orange-500/30" title="Day 5 (Today)"></span>
-                    <span class="h-2 w-7 rounded-full bg-slate-800" title="Upcoming"></span>
-                    <span class="h-2 w-7 rounded-full bg-slate-800" title="Upcoming"></span>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Revision Section: Heading & Batch Preview Outside the Box -->
-    <div class="space-y-3 pt-2">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <h2 class="text-lg font-bold text-white flex items-center gap-2.5">
-                    <span>Today's Revision</span>
-                    <span class="text-xs font-mono px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">
-                        Visual Preview &middot; Due Today
-                    </span>
-                </h2>
-                <p class="text-xs text-slate-400 mt-0.5">Visual preview of solved problems scheduled for active recall</p>
-            </div>
-
-            <!-- Preview Batch Selector Outside Box -->
-            <div class="flex items-center gap-2 text-xs">
-                <span class="text-slate-400 font-medium">Session Batch:</span>
-                <div class="flex items-center gap-1 bg-[#101623] p-1 rounded-lg border border-white/10 font-mono">
-                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">5</button>
-                    <button class="px-2.5 py-1 rounded bg-orange-600 text-white font-bold">10</button>
-                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">15</button>
-                    <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors">All</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ONLY Problems in the Box -->
-        <div id="problems-container" class="bg-[#101623] rounded-2xl border border-white/10 p-5 sm:p-6 shadow-xl">
-            <div class="divide-y divide-white/5">
-                {% for problem in revision_queue %}
-                <div class="py-3.5 flex items-center justify-between gap-4 {% if problem.is_completed %}opacity-40{% endif %} transition-opacity">
-                    <!-- Left: Problem number and Title -->
-                    <div class="flex items-center gap-3 min-w-0">
-                        <span class="text-xs font-mono text-slate-500 w-6 text-right shrink-0">{{ forloop.counter }}.</span>
-                        
-                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                            <span class="text-sm font-medium {% if problem.is_completed %}line-through text-slate-400{% else %}text-white{% endif %} truncate">
-                                <span class="font-mono text-xs text-slate-400 mr-1.5">#{{ problem.number }}</span>{{ problem.title }}
-                            </span>
-
-                            {% if problem.is_completed %}
-                            <span class="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
-                                <i data-lucide="check" class="w-3 h-3"></i> Reviewed
-                            </span>
+                        <!-- The Flying / Orbiting Rocket (Positioned along the trajectory line) -->
+                        <div class="absolute top-1/2 flex items-center transition-all duration-700 ease-out z-20 {% if stats.rocket.is_max %}rocket-flying-inplace{% endif %}" style="left: {{ stats.rocket.rocket_pct }}%; transform: translate(-50%, -50%);">
+                            {% if stats.rocket.has_flame %}
+                            <!-- Energetic Exhaust Flame Thruster -->
+                            <div class="rocket-flame-active -mr-1.5 flex items-center">
+                                <svg class="w-5 h-4" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M24 8C17 4.5 9 1 0 8C9 15 17 11.5 24 8Z" fill="url(#exhaustGlow)" />
+                                    <path d="M22 8C16 5.5 11 3 4 8C11 13 16 10.5 22 8Z" fill="url(#exhaustCore)" />
+                                    <defs>
+                                        <linearGradient id="exhaustGlow" x1="24" y1="8" x2="0" y2="8" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#ea580c" />
+                                            <stop offset="0.65" stop-color="#f97316" />
+                                            <stop offset="1" stop-color="#ef4444" stop-opacity="0" />
+                                        </linearGradient>
+                                        <linearGradient id="exhaustCore" x1="22" y1="8" x2="4" y2="8" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#ffffff" />
+                                            <stop offset="0.5" stop-color="#fef08a" />
+                                            <stop offset="1" stop-color="#facc15" stop-opacity="0" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <!-- Active Glowing Rocket Icon (Pointed Forward) -->
+                            <div class="p-1 rounded-full bg-slate-950/90 border border-orange-500/60 shadow-[0_0_12px_rgba(249,115,22,0.8)] text-orange-400" title="Active Streak: {{ stats.active_streak }} {% if stats.active_streak == 1 %}day{% else %}days{% endif %}!">
+                                <svg class="w-3.5 h-3.5 transform rotate-45" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                                    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                                    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                                    <path d="M12 9v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                                </svg>
+                            </div>
+                            {% else %}
+                            <!-- Landed / Idle Rocket on Left Base (Streak == 0, no flame) -->
+                            <div class="p-1 rounded-full bg-slate-900 border border-white/10 text-slate-500 shadow-sm" title="Launch your revision streak today!">
+                                <svg class="w-3.5 h-3.5 transform rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                                    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                                    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                                    <path d="M12 9v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                                </svg>
+                            </div>
                             {% endif %}
                         </div>
                     </div>
+                </div>
 
-                    <!-- Right: Pattern & Difficulty -->
-                    <div class="flex items-center gap-6 shrink-0 font-mono text-xs">
-                        <span class="text-slate-400">{{ problem.pattern }}</span>
-                        
+                <!-- Cosmic Canvas Footer Row: Bottom-Right Total Days -->
+                <div class="relative z-10 flex items-center justify-end text-[11px] font-mono text-slate-400 mt-2.5 pt-0.5">
+                    <span>Total Days: <strong class="text-white font-semibold">{{ stats.total_revision_days }}d</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revision Section: Heading & Interactive Filters Outside the Box -->
+    <div class="space-y-3 pt-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 id="todays-revision-heading" class="text-lg font-bold text-white flex items-center gap-2.5 scroll-mt-6">
+                    <span>Today's Revision</span>
+                </h2>
+            </div>
+
+            <!-- Filters (Segmented Difficulty & Single Pattern Input) with Permanent Reset Icon -->
+            <div class="flex flex-wrap items-center gap-2.5 text-xs">
+                <!-- Difficulty Filter (Segmented like Add Problem modal) -->
+                <div id="filter-diff-selector" class="flex items-center gap-1 p-0.5 rounded-xl border font-mono text-xs" style="background-color: var(--color-bg-input); border-color: var(--color-border-base);">
+                    <button type="button" id="filter-diff-easy" onclick="toggleDifficultyFilter('Easy')" class="filter-diff-btn px-2.5 py-1 text-center rounded-lg text-[11px] font-medium transition-all cursor-pointer text-slate-400 hover:text-emerald-400 border border-transparent">Easy</button>
+                    <button type="button" id="filter-diff-medium" onclick="toggleDifficultyFilter('Medium')" class="filter-diff-btn px-2.5 py-1 text-center rounded-lg text-[11px] font-medium transition-all cursor-pointer text-slate-400 hover:text-amber-400 border border-transparent">Med</button>
+                    <button type="button" id="filter-diff-hard" onclick="toggleDifficultyFilter('Hard')" class="filter-diff-btn px-2.5 py-1 text-center rounded-lg text-[11px] font-medium transition-all cursor-pointer text-slate-400 hover:text-rose-400 border border-transparent">Hard</button>
+                </div>
+
+                <!-- Pattern Filter (Text field with placeholder Pattern, covers field when chosen, no custom tags) -->
+                <div class="relative w-40 sm:w-48">
+                    <div id="filter-pattern-container" class="w-full h-8 px-2.5 rounded-xl border flex items-center transition-all focus-within:border-orange-500 overflow-hidden" style="background-color: var(--color-bg-input); border-color: var(--color-border-base);">
+                        <!-- Selected pattern chip (covers text field) -->
+                        <div id="filter-pattern-chip" class="hidden w-full items-center justify-between gap-1 px-1.5 py-0.5 rounded-lg text-[11px] font-mono font-medium border border-orange-500/30 text-orange-400 bg-orange-500/10">
+                            <span id="filter-pattern-name" class="truncate"></span>
+                            <button type="button" onclick="clearFilterPattern(event)" class="text-orange-400 hover:text-white transition-colors cursor-pointer text-sm leading-none shrink-0" title="Remove">&times;</button>
+                        </div>
+
+                        <!-- Pattern search input field -->
+                        <input 
+                            type="text" 
+                            id="filter-pattern-input" 
+                            placeholder="Pattern" 
+                            autocomplete="off"
+                            onfocus="handleFilterPatternFocus()"
+                            oninput="handleFilterPatternSearch(this.value)"
+                            class="w-full text-xs bg-transparent border-0 outline-none p-0 text-white placeholder:text-slate-500 font-mono"
+                            style="color: var(--color-text-main);"
+                        >
+                    </div>
+
+                    <!-- Dropdown List for standard + user patterns (Reduced size, max 4 options, no custom tags) -->
+                    <div id="filter-pattern-dropdown" class="hidden absolute z-30 left-0 right-0 mt-1 max-h-36 overflow-y-auto rounded-xl shadow-2xl p-1 text-xs space-y-0.5 border" style="background-color: var(--color-bg-elevated); border-color: var(--color-border-base);"></div>
+                </div>
+
+                <!-- Permanent Reset Logo (No text, icon only) -->
+                <button type="button" id="btn-reset-filters" onclick="resetAllProblemFilters()" class="w-8 h-8 rounded-xl border flex items-center justify-center text-slate-400 hover:text-orange-400 hover:border-orange-500/30 transition-all cursor-pointer shrink-0" style="background-color: var(--color-bg-input); border-color: var(--color-border-base);" title="Reset filters">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ONLY Problems in the Box (Fixed size matching 5 problems regardless of problem count, compact, iOS wheel) -->
+        <div id="problems-container" class="bg-[#101623] rounded-2xl border border-white/10 p-4 sm:p-5 shadow-xl">
+            <div id="problems-list" class="divide-y divide-white/5 flex flex-col justify-start overflow-hidden" style="min-height: 194px; height: 194px;">
+                {% for problem in revision_queue %}
+                <div class="problem-preview-row h-[38px] flex items-center justify-between gap-4 {% if forloop.counter > 5 %}hidden{% endif %} transition-all duration-200 cursor-default px-1"
+                     data-difficulty="{{ problem.difficulty }}"
+                     data-patterns="{{ problem.pattern_names_csv|lower }}">
+                    <!-- Left: Title ONLY (Clean display, no tags, no line-through) -->
+                    <div class="flex items-center min-w-0">
+                        <span class="text-sm font-medium problem-title-text text-white truncate">
+                            {{ problem.title }}
+                        </span>
+                    </div>
+
+                    <!-- Right: Difficulty (Pattern is NOT shown) -->
+                    <div class="flex items-center gap-4 shrink-0 font-mono text-xs">
                         {% if problem.difficulty == 'Easy' %}
                             <span class="text-emerald-400 w-14 text-right font-medium">Easy</span>
                         {% elif problem.difficulty == 'Medium' %}
@@ -138,11 +262,31 @@
                         {% endif %}
                     </div>
                 </div>
+                {% empty %}
+                <div class="h-full flex flex-col items-center justify-center py-4 text-center space-y-2">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                    <div class="space-y-0.5">
+                        <h3 class="text-xs font-semibold text-white">No Solved Problems Yet</h3>
+                        <p class="text-[11px] text-slate-400 max-w-sm mx-auto">
+                            Add DSA problems to initialize FSRS spaced repetition.
+                        </p>
+                    </div>
+                </div>
                 {% endfor %}
+
+                <!-- Filter no-match empty state (occupies fixed height) -->
+                <div id="no-filter-match" class="hidden h-full flex flex-col items-center justify-center py-4 text-center space-y-2">
+                    <div class="text-slate-400 text-xs">No problems match the selected filter criteria.</div>
+                    <button type="button" onclick="resetAllProblemFilters()" class="text-xs font-semibold text-orange-400 hover:text-orange-300 underline cursor-pointer">
+                        Reset filters to view all due problems
+                    </button>
+                </div>
             </div>
 
             <!-- Single Revision CTA at End of Problems Box -->
-            <div class="pt-5 mt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="pt-3.5 mt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="text-xs text-slate-400">
                     <span class="text-white font-semibold">Adaptive revision session</span> &middot; Review as many or as few as you want.
                 </div>
@@ -155,88 +299,169 @@
         </div>
     </div>
 
-    <!-- Bottom Stats Cards: Recall Performance & Pattern Recall -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+    <!-- Bottom Stats Cards: Pattern Recall & Most Forgotten Problems -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16 sm:mt-20 pt-2">
         
-        <!-- Left: Recall Performance -->
-        <div class="bg-[#101623] rounded-2xl border border-white/10 p-6 shadow-xl space-y-5">
-            <div class="flex items-center justify-between pb-3 border-b border-white/5">
-                <div>
-                    <h3 class="text-sm font-bold text-white">Recall Performance</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Active recall outcome distribution</p>
-                </div>
-                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">{{ stats.total_reviews }} Total Reviews</span>
-            </div>
-
-            <!-- Segmented Distribution Bar -->
-            <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden flex">
-                <div class="bg-[#00C853] h-full" style="width: {{ recall_stats.easy_pct }}%" title="Easy ({{ recall_stats.easy_pct }}%)"></div>
-                <div class="bg-[#AEEA00] h-full" style="width: {{ recall_stats.good_pct }}%" title="Medium ({{ recall_stats.good_pct }}%)"></div>
-                <div class="bg-[#FFD600] h-full" style="width: {{ recall_stats.hard_pct }}%" title="Hard ({{ recall_stats.hard_pct }}%)"></div>
-                <div class="bg-[#FF1744] h-full" style="width: {{ recall_stats.again_pct }}%" title="Again ({{ recall_stats.again_pct }}%)"></div>
-            </div>
-
-            <!-- Stats Rows (FSRS Ratings) -->
-            <div class="space-y-2.5 text-xs font-mono">
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
-                    <span class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2 h-2 rounded-full bg-[#00C853]"></span>
-                        <span>Easy &middot; Solved Independently</span>
-                    </span>
-                    <span class="font-bold text-[#009624] dark:text-[#00C853]">{{ recall_stats.easy_count }} ({{ recall_stats.easy_pct }}%)</span>
-                </div>
-
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
-                    <span class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2 h-2 rounded-full bg-[#AEEA00]"></span>
-                        <span>Medium &middot; Recognized Pattern</span>
-                    </span>
-                    <span class="font-bold text-[#558B2F] dark:text-[#AEEA00]">{{ recall_stats.good_count }} ({{ recall_stats.good_pct }}%)</span>
-                </div>
-
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
-                    <span class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2 h-2 rounded-full bg-[#FFD600]"></span>
-                        <span>Hard &middot; Needed Hints/Notes</span>
-                    </span>
-                    <span class="font-bold text-[#B45309] dark:text-[#FFD600]">{{ recall_stats.hard_count }} ({{ recall_stats.hard_pct }}%)</span>
-                </div>
-
-                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
-                    <span class="flex items-center gap-2 text-slate-300">
-                        <span class="w-2 h-2 rounded-full bg-[#FF1744]"></span>
-                        <span>Again &middot; Needed Full Solution</span>
-                    </span>
-                    <span class="font-bold text-[#D50000] dark:text-[#FF1744]">{{ recall_stats.again_count }} ({{ recall_stats.again_pct }}%)</span>
+        <!-- Left: Pattern Recall (Transparent card, header aligned, unified color thresholds) -->
+        <div class="bg-transparent flex flex-col justify-start space-y-3">
+            <!-- Header with Top / Weak Tab Toggle (Fixed height h-9 to align baselines) -->
+            <div class="h-9 flex items-center justify-between pb-1 gap-3">
+                <h3 class="text-sm font-bold text-white tracking-wide">Pattern Recall</h3>
+                <!-- Interactive Toggle Tabs -->
+                <div class="pattern-toggle-bg p-1 rounded-xl font-mono text-xs shrink-0 flex items-center gap-1">
+                    <button type="button" onclick="switchPatternTab('top')" id="btn-tab-top" class="px-3 py-1 rounded-lg font-bold text-xs bg-orange-600 text-white shadow-sm transition-all cursor-pointer">Top Patterns</button>
+                    <button type="button" onclick="switchPatternTab('weak')" id="btn-tab-weak" class="px-3 py-1 rounded-lg text-xs text-slate-400 hover:text-white transition-all cursor-pointer">Weak Patterns</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Right: Pattern Recall -->
-        <div class="bg-[#101623] rounded-2xl border border-white/10 p-6 shadow-xl space-y-5">
-            <div class="flex items-center justify-between pb-3 border-b border-white/5">
-                <div>
-                    <h3 class="text-sm font-bold text-white">Pattern Recall</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Good &amp; Easy recall rate by algorithmic pattern</p>
-                </div>
-                <span class="text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">6 Patterns</span>
-            </div>
-
-            <div class="space-y-3.5">
-                {% for pat in pattern_stats %}
-                <div class="space-y-1.5 text-xs">
-                    <div class="flex items-center justify-between">
-                        <span class="text-slate-300 font-medium">{{ pat.name }}</span>
-                        <span class="font-mono text-slate-400 font-semibold">{{ pat.pct }}%</span>
+            <!-- Tab 1: Top Patterns (Fixed height matching 5 items for visual consistency) -->
+            <div id="pattern-view-top" class="flex flex-col justify-between overflow-hidden" style="min-height: 194px; height: 194px;">
+                {% for pat in top_patterns %}
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-mono">
+                        <span class="flex items-center gap-2 text-white font-medium truncate">
+                            {% if pat.pct < 35 %}
+                            <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
+                            {% elif pat.pct < 65 %}
+                            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                            {% else %}
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                            {% endif %}
+                            <span class="truncate">{{ pat.name }}</span>
+                        </span>
+                        {% if pat.pct < 35 %}
+                        <span class="font-bold text-rose-500 shrink-0 ml-2">{{ pat.pct }}%</span>
+                        {% elif pat.pct < 65 %}
+                        <span class="font-bold text-amber-400 shrink-0 ml-2">{{ pat.pct }}%</span>
+                        {% else %}
+                        <span class="font-bold text-emerald-400 shrink-0 ml-2">{{ pat.pct }}%</span>
+                        {% endif %}
                     </div>
-                    <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                        <div class="bg-orange-500 h-full rounded-full" style="width: {{ pat.pct }}%"></div>
+                    <div class="w-full h-1.5 pattern-progress-bg rounded-full overflow-hidden">
+                        {% if pat.pct < 35 %}
+                        <div class="h-full rounded-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-500" style="width: {{ pat.pct }}%"></div>
+                        {% elif pat.pct < 65 %}
+                        <div class="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500" style="width: {{ pat.pct }}%"></div>
+                        {% else %}
+                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-lime-400 transition-all duration-500" style="width: {{ pat.pct }}%"></div>
+                        {% endif %}
                     </div>
+                </div>
+                {% empty %}
+                <div class="h-full flex flex-col items-center justify-center text-center text-xs text-slate-400">
+                    No patterns tracked yet.
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Tab 2: Weak Patterns (Fixed height matching 5 items for visual consistency) -->
+            <div id="pattern-view-weak" class="flex flex-col justify-between overflow-hidden hidden" style="min-height: 194px; height: 194px;">
+                {% for pat in weak_patterns %}
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-mono">
+                        <span class="flex items-center gap-2 text-white font-medium truncate">
+                            {% if pat.pct < 35 %}
+                            <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
+                            {% elif pat.pct < 65 %}
+                            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                            {% else %}
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                            {% endif %}
+                            <span class="truncate">{{ pat.name }}</span>
+                        </span>
+                        {% if pat.pct < 35 %}
+                        <span class="font-bold text-rose-500 shrink-0 ml-2">{{ pat.pct }}%</span>
+                        {% elif pat.pct < 65 %}
+                        <span class="font-bold text-amber-400 shrink-0 ml-2">{{ pat.pct }}%</span>
+                        {% else %}
+                        <span class="font-bold text-emerald-400 shrink-0 ml-2">{{ pat.pct }}%</span>
+                        {% endif %}
+                    </div>
+                    <div class="w-full h-1.5 pattern-progress-bg rounded-full overflow-hidden">
+                        {% if pat.pct < 35 %}
+                        <div class="h-full rounded-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-500" style="width: {{ pat.pct }}%"></div>
+                        {% elif pat.pct < 65 %}
+                        <div class="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500" style="width: {{ pat.pct }}%"></div>
+                        {% else %}
+                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-lime-400 transition-all duration-500" style="width: {{ pat.pct }}%"></div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="h-full flex flex-col items-center justify-center text-center text-xs text-slate-400">
+                    No weak patterns identified.
                 </div>
                 {% endfor %}
             </div>
         </div>
 
+        <!-- Right: Most Forgotten Problems (Transparent card, header aligned, fixed 194px height) -->
+        <div class="bg-transparent flex flex-col justify-start space-y-3">
+            <!-- Header (Fixed height h-9 to align with Pattern Recall toggle header) -->
+            <div class="h-9 flex items-center justify-between pb-1">
+                <h3 class="text-sm font-bold text-white tracking-wide">Most Forgotten Problems</h3>
+            </div>
+
+            <!-- Problem List (Fixed height 194px matching 5 items) -->
+            <div class="flex flex-col justify-between overflow-hidden divide-y divide-white/5" style="min-height: 194px; height: 194px;">
+                {% for prob in most_forgotten %}
+                <div class="h-[38px] flex items-center justify-between px-1 transition-colors">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="text-xs font-mono text-slate-500 w-4 text-right shrink-0">{{ forloop.counter }}.</span>
+                        <a href="{{ prob.canonical_url }}" target="_blank" rel="noopener noreferrer" class="forgotten-prob-title text-xs font-medium truncate" title="Open {{ prob.title }}">
+                            {% if prob.number %}<span class="font-mono text-slate-400 mr-1.5">#{{ prob.number }}</span>{% endif %}{{ prob.title }}
+                        </a>
+                    </div>
+                    <span class="text-xs font-mono shrink-0 ml-3 font-medium {% if prob.difficulty == 'Easy' %}text-emerald-400{% elif prob.difficulty == 'Medium' %}text-amber-400{% else %}text-rose-400{% endif %}">
+                        {{ prob.difficulty }}
+                    </span>
+                </div>
+                {% empty %}
+                <div class="h-full flex flex-col items-center justify-center text-center text-xs text-slate-400">
+                    No forgotten problems yet. Problems marked "Forgot" during revisions will appear here.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Revision Heatmap Card: LeetCode-Style Layout (Month columns with month label centered below) -->
+    <div aria-label="Revision Heatmap" class="bg-transparent space-y-4 mt-16 sm:mt-20 pt-2">
+        <!-- Header -->
+        <div class="pb-1">
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-tight">
+                {{ heatmap_data.total_reviews_year }} <span class="text-xs sm:text-sm font-normal text-slate-300">submissions in the past one year</span>
+            </h3>
+        </div>
+
+        <!-- LeetCode-Style 12 Month Blocks (Month labels directly centered below each month) -->
+        <div class="w-full flex items-start justify-between gap-2 overflow-x-auto py-2 select-none">
+            {% for month in heatmap_data.months_data %}
+            <div class="flex flex-col items-center shrink-0 flex-1">
+                <!-- Month Columns (Sunday to Saturday rows) -->
+                <div class="flex gap-[3px]">
+                    {% for col in month.columns %}
+                    <div class="flex flex-col gap-[3px]">
+                        {% for day in col %}
+                            {% if day and not day.is_future %}
+                                <div class="w-2.5 h-2.5 sm:w-[11px] sm:h-[11px] rounded-[2px] transition-colors heatmap-cell heatmap-level-{{ day.level }} cursor-pointer"
+                                     title="{% if day.count == 0 %}No submissions on {{ day.formatted_date }}{% elif day.count == 1 %}1 submission on {{ day.formatted_date }}{% else %}{{ day.count }} submissions on {{ day.formatted_date }}{% endif %}"
+                                     data-count="{{ day.count }}"
+                                     data-date="{{ day.formatted_date }}">
+                                </div>
+                            {% else %}
+                                <div class="w-2.5 h-2.5 sm:w-[11px] sm:h-[11px] invisible pointer-events-none"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Month Name at Bottom Centered Under Its Month Block -->
+                <span class="text-[11px] font-mono text-slate-400 mt-2 select-none text-center">{{ month.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 
 </div>
@@ -485,14 +710,14 @@
 
                 </div>
 
-                <!-- Recall Performance Section (Spans Full Width Below Both Columns) -->
+                <!-- Solving Experience Section (Spans Full Width Below Both Columns) -->
                 <div id="fsrs-rating-container" class="pt-3 border-t space-y-2 mt-3" style="border-color: var(--color-border-base);">
                     <div class="flex items-center justify-between">
                         <div>
                             <label class="block text-xs font-semibold" style="color: var(--color-text-title);">
-                                Recall Performance <span class="text-rose-400">*</span>
+                                Solving Experience <span class="text-rose-400">*</span>
                             </label>
-                            <p class="text-[11px]" style="color: var(--color-text-muted);">How well did you recall or solve this problem?</p>
+                            <p class="text-[11px]" style="color: var(--color-text-muted);">How did you solve this problem?</p>
                         </div>
                         <span id="initial-rating-label" class="text-xs font-mono font-medium text-slate-400">Not selected</span>
                     </div>
@@ -522,15 +747,15 @@
                             <div class="text-[10px] leading-tight" style="color: var(--color-text-muted);">Needed hints/notes</div>
                         </button>
 
-                        <!-- Medium / Good: Lime #AEEA00 -->
+                        <!-- Good: Lime #AEEA00 -->
                         <button 
                             type="button" 
-                            id="init-btn-medium" 
-                            onclick="setInitialRating('Medium')" 
+                            id="init-btn-good" 
+                            onclick="setInitialRating('Good')" 
                             class="init-rating-btn p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[64px] cursor-pointer"
                             style="background-color: var(--color-bg-input); border-color: var(--color-border-base);"
                         >
-                            <div class="text-[#558B2F] dark:text-[#AEEA00] font-bold text-xs">Medium</div>
+                            <div class="text-[#558B2F] dark:text-[#AEEA00] font-bold text-xs">Good</div>
                             <div class="text-[10px] leading-tight" style="color: var(--color-text-muted);">Solved with effort</div>
                         </button>
 
@@ -546,7 +771,7 @@
                             <div class="text-[10px] leading-tight" style="color: var(--color-text-muted);">Quick &amp; independent</div>
                         </button>
                     </div>
-                    <div id="rating-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Please select recall performance.</div>
+                    <div id="rating-error" class="hidden text-[11px] font-mono text-rose-400 mt-1">Please select how you solved this problem.</div>
                 </div>
 
                 <!-- Action Buttons Row (Bottom Right) -->
@@ -814,8 +1039,8 @@
             activeClasses: 'border-2 border-[#FFD600] bg-[#FFD600]/15 ring-1 ring-[#FFD600]/30 shadow-md',
             hoverBorder: 'hover:border-[#FFD600]/50'
         },
-        'Medium': {
-            label: 'Medium (solved with effort)',
+        'Good': {
+            label: 'Good (solved with effort)',
             textColor: 'text-[#558B2F] dark:text-[#AEEA00]',
             activeClasses: 'border-2 border-[#AEEA00] bg-[#AEEA00]/15 ring-1 ring-[#AEEA00]/30 shadow-md',
             hoverBorder: 'hover:border-[#AEEA00]/50'
@@ -837,7 +1062,7 @@
             label.textContent = 'Not selected';
             label.className = 'text-xs font-mono font-medium text-slate-400';
         }
-        ['Forgot', 'Hard', 'Medium', 'Easy'].forEach(r => {
+        ['Forgot', 'Hard', 'Good', 'Easy'].forEach(r => {
             const btn = document.getElementById(`init-btn-${r.toLowerCase()}`);
             if (!btn) return;
             const cfg = initialRatingConfig[r];
@@ -848,6 +1073,7 @@
     }
 
     function setInitialRating(rating) {
+        
         clearFieldError('rating-error');
         currentInitialRating = rating;
         document.getElementById('modal-initial-rating').value = rating;
@@ -857,7 +1083,7 @@
             label.className = `text-xs font-mono font-bold ${initialRatingConfig[rating].textColor}`;
         }
 
-        ['Forgot', 'Hard', 'Medium', 'Easy'].forEach(r => {
+        ['Forgot', 'Hard', 'Good', 'Easy'].forEach(r => {
             const btn = document.getElementById(`init-btn-${r.toLowerCase()}`);
             if (!btn) return;
             const cfg = initialRatingConfig[r];
@@ -1352,6 +1578,281 @@
 
     function handleStartRevision() {
         showToast('Starting revision session.');
+    }
+
+    // ==========================================
+    // TODAY'S REVISION INTERACTIVE FILTERS & IOS WHEEL DIMMING
+    // ==========================================
+    const allAvailableFilterPatterns = [
+        {% for p in all_patterns %}
+        "{{ p.name|escapejs }}",
+        {% endfor %}
+    ];
+
+    let currentFilterDiff = '';
+    let currentFilterPattern = '';
+
+    function toggleDifficultyFilter(diff) {
+        if (currentFilterDiff === diff) {
+            currentFilterDiff = '';
+        } else {
+            currentFilterDiff = diff;
+        }
+        updateDifficultyButtons();
+        applyAllProblemFilters();
+    }
+
+    function updateDifficultyButtons() {
+        const btnEasy = document.getElementById('filter-diff-easy');
+        const btnMed = document.getElementById('filter-diff-medium');
+        const btnHard = document.getElementById('filter-diff-hard');
+
+        const baseBtnClass = 'filter-diff-btn px-2.5 py-1 text-center rounded-lg text-[11px] font-medium transition-all cursor-pointer';
+
+        if (btnEasy) {
+            if (currentFilterDiff === 'Easy') {
+                btnEasy.className = `${baseBtnClass} bg-[#00C853]/20 border border-[#00C853] text-[#009624] dark:text-[#00C853] font-bold shadow-sm`;
+            } else {
+                btnEasy.className = `${baseBtnClass} border-transparent text-slate-400 hover:text-emerald-400`;
+            }
+        }
+        if (btnMed) {
+            if (currentFilterDiff === 'Medium') {
+                btnMed.className = `${baseBtnClass} bg-[#AEEA00]/20 border border-[#AEEA00] text-[#558B2F] dark:text-[#AEEA00] font-bold shadow-sm`;
+            } else {
+                btnMed.className = `${baseBtnClass} border-transparent text-slate-400 hover:text-amber-400`;
+            }
+        }
+        if (btnHard) {
+            if (currentFilterDiff === 'Hard') {
+                btnHard.className = `${baseBtnClass} bg-[#FF1744]/20 border border-[#FF1744] text-[#D50000] dark:text-[#FF1744] font-bold shadow-sm`;
+            } else {
+                btnHard.className = `${baseBtnClass} border-transparent text-slate-400 hover:text-rose-400`;
+            }
+        }
+    }
+
+    function handleFilterPatternFocus() {
+        const input = document.getElementById('filter-pattern-input');
+        renderFilterPatternDropdown(input ? input.value : '');
+    }
+
+    function handleFilterPatternSearch(query) {
+        renderFilterPatternDropdown(query);
+    }
+
+    function renderFilterPatternDropdown(query) {
+        const dropdown = document.getElementById('filter-pattern-dropdown');
+        if (!dropdown) return;
+
+        const q = (query || '').trim().toLowerCase();
+        // Limit to 4 options sorted by user frequency
+        const matches = allAvailableFilterPatterns
+            .filter(p => !q || p.toLowerCase().includes(q))
+            .slice(0, 4);
+
+        dropdown.innerHTML = '';
+        if (matches.length === 0) {
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'px-3 py-2 text-slate-500 text-xs text-center font-mono';
+            emptyItem.textContent = 'No matching pattern';
+            dropdown.appendChild(emptyItem);
+        } else {
+            matches.forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'px-3 py-1.5 rounded-lg hover:bg-orange-600 hover:text-white text-slate-300 text-xs cursor-pointer flex items-center justify-between font-mono transition-colors';
+                item.innerHTML = `<span>${name}</span>`;
+                item.onclick = () => selectFilterPattern(name);
+                dropdown.appendChild(item);
+            });
+        }
+
+        dropdown.classList.remove('hidden');
+    }
+
+    function selectFilterPattern(patternName) {
+        currentFilterPattern = patternName;
+
+        const input = document.getElementById('filter-pattern-input');
+        const chip = document.getElementById('filter-pattern-chip');
+        const nameSpan = document.getElementById('filter-pattern-name');
+        const dropdown = document.getElementById('filter-pattern-dropdown');
+
+        if (input) {
+            input.value = '';
+            input.classList.add('hidden');
+        }
+        if (nameSpan) nameSpan.textContent = patternName;
+        if (chip) {
+            chip.classList.remove('hidden');
+            chip.classList.add('inline-flex');
+        }
+        if (dropdown) dropdown.classList.add('hidden');
+
+        applyAllProblemFilters();
+    }
+
+    function clearFilterPattern(e) {
+        if (e) e.stopPropagation();
+        currentFilterPattern = '';
+
+        const input = document.getElementById('filter-pattern-input');
+        const chip = document.getElementById('filter-pattern-chip');
+        const dropdown = document.getElementById('filter-pattern-dropdown');
+
+        if (chip) {
+            chip.classList.add('hidden');
+            chip.classList.remove('inline-flex');
+        }
+        if (input) {
+            input.value = '';
+            input.classList.remove('hidden');
+            input.focus();
+        }
+        if (dropdown) dropdown.classList.add('hidden');
+
+        applyAllProblemFilters();
+    }
+
+    function resetAllProblemFilters() {
+        currentFilterDiff = '';
+        currentFilterPattern = '';
+        updateDifficultyButtons();
+
+        const input = document.getElementById('filter-pattern-input');
+        const chip = document.getElementById('filter-pattern-chip');
+        const dropdown = document.getElementById('filter-pattern-dropdown');
+
+        if (chip) {
+            chip.classList.add('hidden');
+            chip.classList.remove('inline-flex');
+        }
+        if (input) {
+            input.value = '';
+            input.classList.remove('hidden');
+        }
+        if (dropdown) dropdown.classList.add('hidden');
+
+        applyAllProblemFilters();
+    }
+
+    function applyAllProblemFilters() {
+        const rows = Array.from(document.querySelectorAll('.problem-preview-row'));
+        const noMatchEl = document.getElementById('no-filter-match');
+        if (rows.length === 0) return;
+
+        const diffFilter = currentFilterDiff.trim();
+        const patternFilter = currentFilterPattern.trim().toLowerCase();
+
+        let matchingRows = [];
+        rows.forEach(row => {
+            const rowDiff = (row.dataset.difficulty || '').trim();
+            const rowPatterns = (row.dataset.patterns || '').trim().toLowerCase();
+
+            const matchDiff = !diffFilter || rowDiff === diffFilter;
+            const patternsList = rowPatterns.split(',').map(s => s.trim());
+            const matchPattern = !patternFilter || patternsList.includes(patternFilter);
+
+            if (matchDiff && matchPattern) {
+                matchingRows.push(row);
+            } else {
+                row.classList.add('hidden');
+                row.classList.remove('problem-wheel-dim-edge', 'problem-wheel-dim-mid', 'problem-wheel-center');
+            }
+        });
+
+        // Limit to maximum 5 problems
+        const visibleRows = matchingRows.slice(0, 5);
+        matchingRows.slice(5).forEach(row => {
+            row.classList.add('hidden');
+            row.classList.remove('problem-wheel-dim-edge', 'problem-wheel-dim-mid', 'problem-wheel-center');
+        });
+
+        if (noMatchEl) {
+            if (matchingRows.length === 0) {
+                noMatchEl.classList.remove('hidden');
+            } else {
+                noMatchEl.classList.add('hidden');
+            }
+        }
+
+        // Apply iOS wheel diminishing effect if visible count >= 2
+        const count = visibleRows.length;
+        visibleRows.forEach((row, idx) => {
+            row.classList.remove('hidden', 'problem-wheel-dim-edge', 'problem-wheel-dim-mid', 'problem-wheel-center');
+
+            if (count > 2) {
+                if (count === 5) {
+                    if (idx === 0 || idx === 4) {
+                        row.classList.add('problem-wheel-dim-edge');
+                    } else if (idx === 1 || idx === 3) {
+                        row.classList.add('problem-wheel-dim-mid');
+                    } else {
+                        row.classList.add('problem-wheel-center');
+                    }
+                } else if (count === 4) {
+                    if (idx === 0 || idx === 3) {
+                        row.classList.add('problem-wheel-dim-edge');
+                    } else {
+                        row.classList.add('problem-wheel-dim-mid');
+                    }
+                } else if (count === 3) {
+                    if (idx === 0 || idx === 2) {
+                        row.classList.add('problem-wheel-dim-edge');
+                    } else {
+                        row.classList.add('problem-wheel-center');
+                    }
+                }
+            } else if (count === 2) {
+                // Second problem is focused instead of first when there are two problems
+                if (idx === 0) {
+                    row.classList.add('problem-wheel-dim-edge');
+                } else {
+                    row.classList.add('problem-wheel-center');
+                }
+            } else {
+                row.classList.add('problem-wheel-center');
+            }
+        });
+    }
+
+    // Close filter pattern dropdown on outside click
+    document.addEventListener('click', (e) => {
+        const container = document.getElementById('filter-pattern-container');
+        const dropdown = document.getElementById('filter-pattern-dropdown');
+        if (dropdown && !dropdown.contains(e.target) && container && !container.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    // Initialize problem filters & diminishing effect on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        applyAllProblemFilters();
+    });
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        applyAllProblemFilters();
+    }
+
+    // Toggle between Top Patterns and Weak Patterns in Pattern Recall card
+    function switchPatternTab(tab) {
+        const topView = document.getElementById('pattern-view-top');
+        const weakView = document.getElementById('pattern-view-weak');
+        const btnTop = document.getElementById('btn-tab-top');
+        const btnWeak = document.getElementById('btn-tab-weak');
+
+        if (!topView || !weakView || !btnTop || !btnWeak) return;
+
+        if (tab === 'top') {
+            topView.classList.remove('hidden');
+            weakView.classList.add('hidden');
+            btnTop.className = 'px-3 py-1 rounded-lg font-bold text-xs bg-orange-600 text-white shadow-sm transition-all cursor-pointer';
+            btnWeak.className = 'px-3 py-1 rounded-lg text-xs text-slate-400 hover:text-white transition-all cursor-pointer';
+        } else {
+            topView.classList.add('hidden');
+            weakView.classList.remove('hidden');
+            btnWeak.className = 'px-3 py-1 rounded-lg font-bold text-xs bg-orange-600 text-white shadow-sm transition-all cursor-pointer';
+            btnTop.className = 'px-3 py-1 rounded-lg text-xs text-slate-400 hover:text-white transition-all cursor-pointer';
+        }
     }
 
     // Close pattern dropdown on outside click
