@@ -146,13 +146,31 @@ class AuthenticationTests(TestCase):
         user = User.objects.create_user(email=self.test_email, password=self.test_password, name=self.test_name)
         self.client.force_login(user)
         
+        # Empty dashboard verification
         response = self.client.get(self.dashboard_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'dashboard.html')
         self.assertContains(response, self.test_name)
         self.assertIn("Start Revising", response.content.decode())
-        self.assertIn("Recall Performance", response.content.decode())
-        self.assertContains(response, "Two Sum")
+        self.assertIn("Most Forgotten", response.content.decode())
+        self.assertIn("Revision Heatmap", response.content.decode())
+        self.assertContains(response, "No Solved Problems Yet")
+
+        # Dashboard with problem verification
+        from core.services.problem_service import create_user_problem_with_fsrs
+        create_user_problem_with_fsrs(
+            user=user,
+            canonical_url="https://leetcode.com/problems/two-sum/",
+            title="Two Sum",
+            difficulty="Easy",
+            pattern_names=["Hashing"],
+            recognition_cue="Lookup complement in O(1)",
+            mistakes="None",
+            notes="Use hash map for complement",
+            initial_rating="Good",
+        )
+        response_with_prob = self.client.get(self.dashboard_url)
+        self.assertContains(response_with_prob, "Two Sum")
 
     def test_authenticated_user_redirected_from_landing(self):
         user = User.objects.create_user(email=self.test_email, password=self.test_password, name=self.test_name)
@@ -589,5 +607,72 @@ class FSRSIssuesVerificationTests(TestCase):
         
         review_count = ReviewHistory.objects.filter(user_problem=up).count()
         self.assertEqual(review_count, 3)
+
+
+class ForgottenProblemsAndHeatmapTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email="learner@recode.dev", password="Password123!", name="Dev Learner")
+        self.client = Client()
+        self.client.force_login(self.user)
+
+    def test_most_forgotten_problems_ranking(self):
+        from core.models import UserProblem, ReviewHistory, Pattern
+        from core.services.analytics_service import get_most_forgotten_problems, get_forgotten_stats
+
+        p_pattern = Pattern.objects.create(name="Binary Search", slug="binary-search", user=self.user)
+
+        # Problem 1: 3 forgot ratings
+        up1 = UserProblem.objects.create(user=self.user, user_title="Search in Rotated Sorted Array", user_url="https://leetcode.com/problems/search-in-rotated-sorted-array/")
+        up1.patterns.add(p_pattern)
+        for _ in range(3):
+            ReviewHistory.objects.create(user_problem=up1, rating=1)
+
+        # Problem 2: 1 forgot rating
+        up2 = UserProblem.objects.create(user=self.user, user_title="Binary Search Basic", user_url="https://leetcode.com/problems/binary-search/")
+        up2.patterns.add(p_pattern)
+        ReviewHistory.objects.create(user_problem=up2, rating=1)
+
+        # Problem 3: 0 forgot ratings (all Good/Easy)
+        up3 = UserProblem.objects.create(user=self.user, user_title="Easy Two Sum", user_url="https://leetcode.com/problems/two-sum/")
+        ReviewHistory.objects.create(user_problem=up3, rating=3)
+
+        forgotten = get_most_forgotten_problems(self.user, limit=5)
+        self.assertEqual(len(forgotten), 2)
+        self.assertEqual(forgotten[0]['title'], "Search in Rotated Sorted Array")
+        self.assertEqual(forgotten[0]['forgot_count'], 3)
+        self.assertEqual(forgotten[1]['title'], "Binary Search Basic")
+        self.assertEqual(forgotten[1]['forgot_count'], 1)
+
+        stats = get_forgotten_stats(self.user)
+        self.assertEqual(stats['total_forgot_ratings'], 4)
+        self.assertEqual(stats['distinct_forgot_problems'], 2)
+
+    def test_revision_heatmap_structure(self):
+        from core.models import UserProblem, ReviewHistory
+        from core.services.analytics_service import get_revision_heatmap_data
+        from django.utils import timezone
+
+        up = UserProblem.objects.create(user=self.user, user_title="Heatmap Test", user_url="https://leetcode.com/problems/heatmap/")
+        # Add reviews today
+        ReviewHistory.objects.create(user_problem=up, rating=3, reviewed_at=timezone.now())
+        ReviewHistory.objects.create(user_problem=up, rating=4, reviewed_at=timezone.now())
+
+        heatmap = get_revision_heatmap_data(self.user, months=12)
+        self.assertEqual(len(heatmap['weeks']), 52)
+        for week in heatmap['weeks']:
+            self.assertEqual(len(week['days']), 7)
+
+        self.assertGreaterEqual(heatmap['total_reviews_year'], 2)
+        self.assertGreaterEqual(heatmap['active_days_year'], 1)
+        self.assertGreaterEqual(heatmap['max_day_reviews'], 2)
+        self.assertTrue(len(heatmap['month_labels']) >= 10)
+
+    def test_dashboard_renders_forgotten_and_heatmap(self):
+        response = self.client.get(reverse('dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('most_forgotten', response.context)
+        self.assertIn('heatmap_data', response.context)
+        self.assertIn("Revision Heatmap", response.content.decode())
+        self.assertIn("Most Forgotten", response.content.decode())
 
 
